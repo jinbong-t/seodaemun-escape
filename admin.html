@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 교사 대시보드 | 서대문 탈출 작전</title>
-  <meta name="description" content="서대문형무소 진로체험 활동지 교사용 수합 대시보드">
+  <title>📊 교사 대시보드 | 서대문 탈출 작전 (방탈출 8단계 확장판)</title>
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -15,628 +15,214 @@
 
   <style>
     :root {
-      --bg:     #f0f2f5;
-      --surface:#ffffff;
-      --border: #e2e8f0;
-      --primary:#4f46e5;
-      --primary-l:#ede9fe;
-      --gold:   #d97706;
-      --gold-l: #fef3c7;
-      --green:  #059669;
-      --green-l:#d1fae5;
-      --red:    #dc2626;
-      --red-l:  #fee2e2;
-      --text:   #1e293b;
-      --text2:  #64748b;
-      --text3:  #94a3b8;
+      --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0;
+      --primary: #b91c1c; --primary-l: #fee2e2;
+      --text: #1e293b; --text2: #64748b;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 15px; }
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    /* ── LOGIN SCREEN ── */
-    #login-screen {
-      min-height: 100vh; display: flex;
-      align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
-    }
-    .login-card {
-      background: #fff; border-radius: 20px;
-      padding: 2.5rem 2rem; max-width: 380px; width: 90%;
-      box-shadow: 0 25px 60px rgba(0,0,0,.3);
-      text-align: center;
-    }
-    .login-icon { font-size: 3.5rem; margin-bottom: .7rem; }
-    .login-title { font-size: 1.4rem; font-weight: 900; color: var(--text); margin-bottom: .3rem; }
-    .login-sub { font-size: .82rem; color: var(--text2); margin-bottom: 1.5rem; }
-    .login-input {
-      width: 100%; border: 2px solid var(--border);
-      border-radius: 10px; padding: .75rem 1rem;
-      font-family: inherit; font-size: 1rem; color: var(--text);
-      outline: none; transition: border-color .25s; margin-bottom: .9rem;
-      text-align: center; letter-spacing: .1em;
-    }
-    .login-input:focus { border-color: var(--primary); }
-    .login-btn {
-      width: 100%; background: var(--primary); color: #fff;
-      border: none; border-radius: 10px; padding: .8rem;
-      font-family: inherit; font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: background .2s;
-    }
-    .login-btn:hover { background: #4338ca; }
-    .login-err { font-size: .82rem; color: var(--red); margin-top: .5rem; display: none; }
-
-    /* ── DASHBOARD ── */
-    #dashboard { display: none; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    
     .header {
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      padding: 0 1.5rem; height: 60px;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 60px;
+      display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
     }
-    .header-left { display: flex; align-items: center; gap: .8rem; }
-    .header-logo { font-size: 1.4rem; }
-    .header-title { font-size: 1rem; font-weight: 700; color: var(--text); }
-    .header-sub { font-size: .75rem; color: var(--text2); }
-    .header-right { display: flex; gap: .6rem; align-items: center; }
+    .header-title { font-size: 1.1rem; font-weight: 900; color: var(--primary); }
+    .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .btn-green { background: #16a34a; color: white; }
+    .btn-primary { background: var(--primary); color: white; }
 
-    .btn {
-      display: inline-flex; align-items: center; gap: .35rem;
-      border: none; border-radius: 8px; cursor: pointer;
-      font-family: inherit; font-weight: 700; transition: all .2s;
-      text-decoration: none; font-size: .82rem; padding: .5rem .9rem;
-    }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: #4338ca; }
-    .btn-green { background: var(--green); color: #fff; }
-    .btn-green:hover { background: #047857; }
-    .btn-ghost { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
-    .btn-ghost:hover { color: var(--text); }
-    .btn-danger { background: var(--red); color: #fff; }
-    .btn-sm { font-size: .75rem; padding: .38rem .7rem; }
+    main { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    th { background: #f1f5f9; font-weight: bold; color: var(--text2); }
+    
+    .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+    .badge-pass { background: #dcfce7; color: #166534; }
+    .badge-fail { background: #fee2e2; color: #991b1b; }
 
-    main { padding: 1.5rem; max-width: 1300px; margin: 0 auto; }
-
-    /* ── STAT CARDS ── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem; margin-bottom: 1.4rem;
-    }
-    .stat-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 1.2rem 1.4rem;
-      display: flex; align-items: center; gap: 1rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,.05);
-    }
-    .stat-icon-wrap {
-      width: 46px; height: 46px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; flex-shrink: 0;
-    }
-    .sc-blue  { background: #ede9fe; }
-    .sc-green { background: var(--green-l); }
-    .sc-gold  { background: var(--gold-l); }
-    .sc-red   { background: var(--red-l); }
-    .stat-info-n { font-size: 1.8rem; font-weight: 900; line-height: 1; margin-bottom: .15rem; }
-    .stat-info-l { font-size: .75rem; color: var(--text2); }
-
-    /* ── TABLE SECTION ── */
-    .section-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,.05);
-    }
-    .section-head {
-      padding: 1rem 1.4rem;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: .6rem;
-    }
-    .section-head-title { font-size: .95rem; font-weight: 700; }
-    .section-head-right { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
-    .search-input {
-      border: 1px solid var(--border); border-radius: 8px;
-      padding: .42rem .8rem; font-family: inherit; font-size: .82rem;
-      color: var(--text); outline: none; transition: border-color .2s; width: 180px;
-    }
-    .search-input:focus { border-color: var(--primary); }
-    .filter-sel {
-      border: 1px solid var(--border); border-radius: 8px;
-      padding: .42rem .6rem; font-family: inherit; font-size: .82rem;
-      color: var(--text); outline: none; background: #fff; cursor: pointer;
-    }
-
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
-    thead tr { background: var(--bg); }
-    th {
-      padding: .7rem 1rem; text-align: left;
-      font-size: .72rem; font-weight: 700; color: var(--text2);
-      text-transform: uppercase; letter-spacing: .08em;
-      white-space: nowrap; border-bottom: 1px solid var(--border);
-    }
-    td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    tbody tr:hover { background: #f8fafc; }
-    tbody tr:last-child td { border-bottom: none; }
-
-    .badge {
-      display: inline-flex; align-items: center; gap: .3rem;
-      border-radius: 50px; padding: .22rem .65rem; font-size: .72rem; font-weight: 700;
-    }
-    .badge-blue  { background: var(--primary-l); color: var(--primary); }
-    .badge-green { background: var(--green-l); color: var(--green); }
-    .badge-gold  { background: var(--gold-l); color: var(--gold); }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.5); z-index: 9000;
-      align-items: center; justify-content: center; padding: 1rem;
-    }
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9000; align-items: center; justify-content: center; }
     .modal-overlay.show { display: flex; }
-    .modal {
-      background: #fff; border-radius: 16px;
-      max-width: 660px; width: 100%; max-height: 90vh;
-      overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,.3);
-      animation: modalIn .3s ease-out;
-    }
-    @keyframes modalIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
-    .modal-head {
-      padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #fff; z-index: 1;
-    }
-    .modal-head-title { font-size: 1rem; font-weight: 700; }
-    .modal-body { padding: 1.4rem 1.5rem; }
-    .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text2); line-height: 1; }
-    .modal-close:hover { color: var(--text); }
-
-    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-bottom: 1rem; }
-    .detail-item { background: var(--bg); border-radius: 10px; padding: .75rem 1rem; }
-    .detail-label { font-size: .7rem; color: var(--text2); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .25rem; }
-    .detail-value { font-size: .88rem; color: var(--text); font-weight: 500; }
-
-    .detail-section { margin-bottom: 1.1rem; }
-    .detail-section-title {
-      font-size: .8rem; font-weight: 700; color: var(--primary);
-      text-transform: uppercase; letter-spacing: .1em;
-      margin-bottom: .5rem; padding-bottom: .35rem;
-      border-bottom: 1px solid var(--primary-l);
-    }
-    .detail-qa { margin-bottom: .6rem; }
-    .detail-q { font-size: .78rem; color: var(--text2); margin-bottom: .2rem; }
-    .detail-a { font-size: .88rem; color: var(--text); line-height: 1.7; background: var(--bg); border-radius: 8px; padding: .5rem .75rem; }
-
-    /* ── EMPTY / LOADING ── */
-    .empty {
-      text-align: center; padding: 3.5rem 1rem; color: var(--text2);
-    }
-    .empty-icon { font-size: 3rem; margin-bottom: .6rem; }
-    .empty-text { font-size: .9rem; }
-
-    .db-indicator {
-      display: inline-flex; align-items: center; gap: .4rem;
-      font-size: .75rem; color: var(--text2);
-    }
-    .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-    .dot-green { background: var(--green); animation: pulse 2s infinite; }
-    .dot-gray  { background: var(--text3); }
-    @keyframes pulse {
-      0%,100%{ opacity:1; } 50%{ opacity:.4; }
-    }
-
-    .refresh-spin { animation: spinR .8s linear; }
-    @keyframes spinR { to { transform: rotate(360deg); } }
-
-    @media(max-width:600px){
-      .detail-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-    }
-
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .modal { background: #fff; border-radius: 12px; width: 600px; max-height: 90vh; overflow-y: auto; padding: 2rem; }
+    .modal-close { float: right; cursor: pointer; font-size: 1.5rem; border: none; background: none; }
+    
+    .detail-section { margin-bottom: 1.5rem; }
+    .detail-title { font-weight: bold; color: var(--primary); border-bottom: 2px solid var(--primary-l); padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+    .detail-text { font-size: 0.95rem; line-height: 1.6; background: #f8fafc; padding: 1rem; border-radius: 6px; }
   </style>
 </head>
 <body>
 
-<!-- ── LOGIN ── -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-icon">🏛️</div>
-    <div class="login-title">교사 대시보드</div>
-    <div class="login-sub">서대문 탈출 작전 · 활동지 수합 시스템</div>
-    <input type="password" class="login-input" id="pw-input" placeholder="비밀번호를 입력하세요"
-      onkeydown="if(event.key==='Enter') login()">
-    <button class="login-btn" onclick="login()">🔑 로그인</button>
-    <div class="login-err" id="login-err">⚠️ 비밀번호가 틀렸습니다.</div>
-  </div>
-</div>
-
-<!-- ── DASHBOARD ── -->
-<div id="dashboard">
-  <!-- Header -->
   <div class="header">
-    <div class="header-left">
-      <div class="header-logo">📊</div>
-      <div>
-        <div class="header-title">서대문 탈출 작전 — 교사 대시보드</div>
-        <div class="header-sub" id="db-indicator-wrap">
-          <span class="db-indicator"><span class="dot dot-gray" id="db-dot"></span><span id="db-label">데이터 로딩 중...</span></span>
-        </div>
-      </div>
-    </div>
-    <div class="header-right">
-      <button class="btn btn-ghost" onclick="refreshData()" id="refresh-btn" title="새로고침">🔄 새로고침</button>
-      <button class="btn btn-green" onclick="exportCSV()">📥 CSV 내보내기</button>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">로그아웃</button>
+    <div class="header-title">📊 서대문 탈출 작전 - 요원 데이터 수합 (8단계 버전)</div>
+    <div>
+      <button class="btn btn-green" onclick="exportCSV()">📥 CSV 다운로드</button>
+      <button class="btn btn-primary" onclick="loadData()">🔄 새로고침</button>
     </div>
   </div>
 
   <main>
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon-wrap sc-blue">📋</div>
-        <div>
-          <div class="stat-info-n" id="stat-total">—</div>
-          <div class="stat-info-l">총 제출 수</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon-wrap sc-green">⭐</div>
-        <div>
-          <div class="stat-info-n" id="stat-avg">—</div>
-          <div class="stat-info-l">평균 만족도</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon-wrap sc-gold">💼</div>
-        <div>
-          <div class="stat-info-n" id="stat-top-career">—</div>
-          <div class="stat-info-l">최다 선택 직업</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon-wrap sc-red">🏚️</div>
-        <div>
-          <div class="stat-info-n" id="stat-top-loc">—</div>
-          <div class="stat-info-l">최다 인상 장소</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Table -->
-    <div class="section-card">
-      <div class="section-head">
-        <div class="section-head-title">📝 전체 제출 목록 <span id="sub-count" style="font-size:.8rem;color:var(--text2);font-weight:400;"></span></div>
-        <div class="section-head-right">
-          <input class="search-input" id="search-input" placeholder="🔍 이름·학반 검색" oninput="renderTable()">
-          <select class="filter-sel" id="filter-class" onchange="renderTable()">
-            <option value="">전체 학반</option>
-          </select>
-          <select class="filter-sel" id="filter-role" onchange="renderTable()">
-            <option value="">전체 역할</option>
-            <option value="journalist">비밀 기자</option>
-            <option value="lawyer">독립 변호사</option>
-            <option value="teacher">비밀 교사</option>
-            <option value="artist">독립 예술가</option>
-            <option value="doctor">독립군 의사</option>
-            <option value="historian">역사 기록가</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>이름</th>
-              <th>학반</th>
-              <th>번호</th>
-              <th>역할</th>
-              <th>선택 직업</th>
-              <th>인상 장소</th>
-              <th>만족도</th>
-              <th>제출 시간</th>
-              <th>상세</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-          </tbody>
-        </table>
-        <div class="empty" id="empty-state" style="display:none;">
-          <div class="empty-icon">📭</div>
-          <div class="empty-text">아직 제출된 활동지가 없습니다.<br>학생들이 제출하면 여기에 표시됩니다.</div>
-        </div>
-      </div>
+    <div class="card">
+      <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">제출 목록 (총 <span id="total-count">0</span>명)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>이름</th>
+            <th>학반/번호</th>
+            <th>M1 위장직업</th>
+            <th>M6(단어) 해독</th>
+            <th>M7(시간표) 추리</th>
+            <th>M8(여옥사) 번호</th>
+            <th>M9(사형장) 유언</th>
+            <th>M10(추모비) 다짐</th>
+            <th>제출 일시</th>
+            <th>상세 보기</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Data goes here -->
+        </tbody>
+      </table>
     </div>
   </main>
-</div>
 
-<!-- ── DETAIL MODAL ── -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal" id="modal-content">
-    <div class="modal-head">
-      <div class="modal-head-title" id="modal-title">학생 상세 보기</div>
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal-content">
       <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2 id="modal-title" style="margin-bottom: 1rem;">학생 상세 정보</h2>
+      <div id="modal-body"></div>
     </div>
-    <div class="modal-body" id="modal-body"></div>
   </div>
-</div>
 
 <script src="firebase-config.js"></script>
 <script>
-/* ─── DATA ─── */
-let allData = [];
-let db = null;
-let unsubscribe = null;
+  let allData = [];
+  let db = null;
 
-const ROLE_NAMES = {
-  journalist:'비밀 기자', lawyer:'독립 변호사', teacher:'비밀 교사',
-  artist:'독립 예술가', doctor:'독립군 의사', historian:'역사 기록가'
-};
-const STARS = ['','⭐','⭐⭐','⭐⭐⭐','⭐⭐⭐⭐','⭐⭐⭐⭐⭐'];
-
-/* ─── LOGIN ─── */
-function login(){
-  const pw = document.getElementById('pw-input').value;
-  const correct = (typeof ADMIN_PASSWORD !== 'undefined') ? ADMIN_PASSWORD : 'teacher2025';
-  if(pw === correct){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    initDashboard();
-  } else {
-    document.getElementById('login-err').style.display='block';
-    document.getElementById('pw-input').value='';
-    document.getElementById('pw-input').focus();
-  }
-}
-
-function logout(){
-  if(unsubscribe) unsubscribe();
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('dashboard').style.display='none';
-  document.getElementById('pw-input').value='';
-  document.getElementById('login-err').style.display='none';
-}
-
-/* ─── INIT ─── */
-function initDashboard(){
   try {
     if(typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== '여기에-API-키-입력'){
       firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
-      setDbIndicator(true);
-      listenFirestore();
-    } else {
-      setDbIndicator(false);
-      loadLocalStorage();
     }
-  } catch(e){
-    setDbIndicator(false);
-    loadLocalStorage();
-  }
-}
+  } catch(e){ console.warn("Firebase Error", e); }
 
-function setDbIndicator(live){
-  document.getElementById('db-dot').className = 'dot '+(live?'dot-green':'dot-gray');
-  document.getElementById('db-label').textContent = live ? 'Firebase 실시간 연결됨' : '로컬 저장소 모드 (Firebase 미설정)';
-}
-
-/* ─── FIRESTORE LISTEN ─── */
-function listenFirestore(){
-  unsubscribe = db.collection('submissions')
-    .orderBy('submittedAt','desc')
-    .onSnapshot(snap=>{
-      allData = snap.docs.map(d=>({id:d.id,...d.data()}));
-      updateAll();
-    }, err=>{
+  async function loadData() {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">데이터를 불러오는 중입니다...</td></tr>';
+    
+    try {
+      if(db) {
+        const snap = await db.collection('escape_submissions').orderBy('submittedAt', 'desc').get();
+        allData = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      } else {
+        const raw = localStorage.getItem('escape_submissions');
+        allData = raw ? JSON.parse(raw).reverse() : [];
+      }
+      renderTable();
+    } catch(err) {
       console.error(err);
-      loadLocalStorage();
-    });
-}
-
-/* ─── LOCALSTORAGE FALLBACK ─── */
-function loadLocalStorage(){
-  const raw = localStorage.getItem('sdm_submissions');
-  allData = raw ? JSON.parse(raw).reverse() : [];
-  updateAll();
-}
-
-function refreshData(){
-  const btn = document.getElementById('refresh-btn');
-  btn.textContent = '🔄 새로고침';
-  btn.classList.add('refresh-spin');
-  setTimeout(()=>btn.classList.remove('refresh-spin'),800);
-  if(!db) loadLocalStorage();
-  // Firestore listener auto-updates
-}
-
-/* ─── UPDATE ALL ─── */
-function updateAll(){
-  updateStats();
-  populateFilters();
-  renderTable();
-}
-
-/* ─── STATS ─── */
-function updateStats(){
-  document.getElementById('stat-total').textContent = allData.length;
-
-  if(allData.length){
-    const ratings = allData.filter(d=>d.rating).map(d=>+d.rating);
-    const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
-    document.getElementById('stat-avg').textContent = avg + (ratings.length ? '점' : '');
-
-    const careers = {};
-    allData.forEach(d=>{ if(d.career) careers[d.career]=(careers[d.career]||0)+1; });
-    const topCareer = Object.entries(careers).sort((a,b)=>b[1]-a[1])[0];
-    document.getElementById('stat-top-career').textContent = topCareer ? topCareer[0] : '—';
-
-    const locs = {};
-    allData.forEach(d=>{ if(d.location) locs[d.location]=(locs[d.location]||0)+1; });
-    const topLoc = Object.entries(locs).sort((a,b)=>b[1]-a[1])[0];
-    document.getElementById('stat-top-loc').textContent = topLoc ? topLoc[0] : '—';
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red;">데이터를 불러오지 못했습니다.</td></tr>';
+    }
   }
-}
 
-/* ─── FILTER OPTIONS ─── */
-function populateFilters(){
-  const classes = [...new Set(allData.map(d=>d.class).filter(Boolean))].sort();
-  const sel = document.getElementById('filter-class');
-  const current = sel.value;
-  sel.innerHTML = '<option value="">전체 학반</option>' + classes.map(c=>`<option value="${c}">${c}</option>`).join('');
-  sel.value = current;
-}
+  function renderTable() {
+    document.getElementById('total-count').textContent = allData.length;
+    const tbody = document.getElementById('table-body');
+    if(allData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">제출된 데이터가 없습니다.</td></tr>';
+      return;
+    }
 
-/* ─── TABLE ─── */
-function getFiltered(){
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const cls = document.getElementById('filter-class').value;
-  const role = document.getElementById('filter-role').value;
-
-  return allData.filter(d=>{
-    if(q && !(d.name||'').toLowerCase().includes(q) && !(d.class||'').toLowerCase().includes(q)) return false;
-    if(cls && d.class!==cls) return false;
-    if(role && d.role!==role) return false;
-    return true;
-  });
-}
-
-function renderTable(){
-  const filtered = getFiltered();
-  const tbody = document.getElementById('table-body');
-  document.getElementById('sub-count').textContent = `(${filtered.length}/${allData.length}건)`;
-
-  if(allData.length===0){
-    tbody.innerHTML='';
-    document.getElementById('empty-state').style.display='block';
-    return;
+    tbody.innerHTML = allData.map(d => `
+      <tr>
+        <td><strong>${esc(d.name)}</strong></td>
+        <td>${esc(d.class)} ${esc(String(d.number))}번</td>
+        <td>${esc(d.m1_job)}</td>
+        <td>${esc(d.m6_ans)}</td>
+        <td>${esc(d.m7_ans)}</td>
+        <td>${esc(d.m8_ans)}</td>
+        <td>${esc(d.m9_will).substring(0, 10)}...</td>
+        <td>${esc(d.m10_career)}</td>
+        <td>${esc(d.submittedAtLocal)}</td>
+        <td><button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openModal('${d.id}')">상세</button></td>
+      </tr>
+    `).join('');
   }
-  document.getElementById('empty-state').style.display='none';
 
-  tbody.innerHTML = filtered.map((d,i)=>`
-    <tr>
-      <td style="color:var(--text3)">${i+1}</td>
-      <td><strong>${esc(d.name||'—')}</strong></td>
-      <td>${esc(d.class||'—')}</td>
-      <td style="text-align:center">${esc(String(d.number||'—'))}</td>
-      <td><span class="badge badge-blue">${ROLE_NAMES[d.role]||d.role||'—'}</span></td>
-      <td><span class="badge badge-gold">${esc(d.career||'—')}</span></td>
-      <td>${esc(d.location||'—')}</td>
-      <td style="text-align:center">${d.rating?STARS[+d.rating]||d.rating+'★':'—'}</td>
-      <td style="color:var(--text2);font-size:.75rem;">${esc(d.submittedAtLocal||'—')}</td>
-      <td><button class="btn btn-primary btn-sm" onclick="openModal('${d.id}')">보기</button></td>
-    </tr>
-  `).join('');
-}
+  function esc(s) { return String(s||'').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function openModal(id) {
+    const d = allData.find(x => x.id === id);
+    if(!d) return;
 
-/* ─── MODAL ─── */
-function openModal(id){
-  const d = allData.find(x=>x.id===id);
-  if(!d) return;
+    document.getElementById('modal-title').textContent = `${d.name} 요원 (${d.class} ${d.number}번)`;
+    document.getElementById('modal-body').innerHTML = `
+      <div class="detail-section">
+        <div class="detail-title">M1. 위장 신분</div>
+        <div class="detail-text">
+          <strong>선택 직업:</strong> ${esc(d.m1_job)}<br>
+          <strong>변명:</strong> ${esc(d.m1_reason)}
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-title">M2~M8. 퍼즐 통과 여부</div>
+        <div class="detail-text">
+          ${d.m3_pass ? '<span class="badge badge-pass">M3(기호) 통과</span>' : '<span class="badge badge-fail">M3 미통과</span>'}
+          ${d.m4_pass ? '<span class="badge badge-pass">M4(타음) 통과</span>' : '<span class="badge badge-fail">M4 미통과</span>'}
+          ${d.m5_pass ? '<span class="badge badge-pass">M5(지도) 통과</span>' : '<span class="badge badge-fail">M5 미통과</span>'}
+          ${d.m6_pass ? '<span class="badge badge-pass">M6(단어) 통과</span>' : '<span class="badge badge-fail">M6 미통과</span>'}
+          ${d.m7_pass ? '<span class="badge badge-pass">M7(시간) 통과</span>' : '<span class="badge badge-fail">M7 미통과</span>'}
+          ${d.m8_pass ? '<span class="badge badge-pass">M8(번호) 통과</span>' : '<span class="badge badge-fail">M8 미통과</span>'}
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-title">M9. 마지막 유언 (사형장)</div>
+        <div class="detail-text">${esc(d.m9_will).replace(/\n/g, '<br>')}</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-title">M10. 미래의 다짐 (추모비)</div>
+        <div class="detail-text">
+          <strong>꿈꾸는 직업:</strong> ${esc(d.m10_career)}<br><br>
+          <strong>나의 다짐:</strong><br>${esc(d.m10_pledge).replace(/\n/g, '<br>')}
+        </div>
+      </div>
+    `;
+    document.getElementById('modal-overlay').classList.add('show');
+  }
 
-  document.getElementById('modal-title').textContent = `📋 ${d.name} (${d.class} ${d.number}번)`;
-  document.getElementById('modal-body').innerHTML = `
-    <div class="detail-grid">
-      <div class="detail-item"><div class="detail-label">이름</div><div class="detail-value">${esc(d.name||'—')}</div></div>
-      <div class="detail-item"><div class="detail-label">학반/번호</div><div class="detail-value">${esc(d.class||'—')} ${esc(String(d.number||'—'))}번</div></div>
-      <div class="detail-item"><div class="detail-label">역할</div><div class="detail-value">${ROLE_NAMES[d.role]||d.role||'—'}</div></div>
-      <div class="detail-item"><div class="detail-label">선택 직업</div><div class="detail-value">${esc(d.career||'—')}</div></div>
-      <div class="detail-item"><div class="detail-label">인상 장소</div><div class="detail-value">${esc(d.location||'—')}</div></div>
-      <div class="detail-item"><div class="detail-label">느낀 감정</div><div class="detail-value">${esc(d.emotion||'—')}</div></div>
-      <div class="detail-item"><div class="detail-label">탈출 시나리오</div><div class="detail-value">${esc(d.scenario||'—')} 선택</div></div>
-      <div class="detail-item"><div class="detail-label">만족도</div><div class="detail-value">${d.rating?STARS[+d.rating]+' ('+d.rating+'점)':'—'}</div></div>
-    </div>
+  function closeModal(e) {
+    if(e && e.target !== document.getElementById('modal-overlay')) return;
+    document.getElementById('modal-overlay').classList.remove('show');
+  }
 
-    <div class="detail-section">
-      <div class="detail-section-title">🗡️ 미션 1 — 역할 선택 이유</div>
-      <div class="detail-qa"><div class="detail-a">${esc(d.roleReason||'—')}</div></div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">🔍 미션 2 — 현장 수사</div>
-      <div class="detail-qa"><div class="detail-q">장소: ${esc(d.location||'—')} / 감정: ${esc(d.emotion||'—')}</div>
-      <div class="detail-a">${esc(d.obs||'—')}</div></div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">✉️ 미션 3 — 비밀 편지</div>
-      <div class="detail-qa"><div class="detail-q">받는 이: ${esc(d.recipient||'—')}</div>
-      <div class="detail-a" style="white-space:pre-wrap;">${esc(d.letter||'—')}</div></div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">🚪 미션 4 — 갈림길 선택</div>
-      <div class="detail-qa"><div class="detail-q">선택: ${esc(d.scenario||'—')}</div>
-      <div class="detail-a">${esc(d.scenarioReason||'—')}</div></div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">💼 미션 5 — 진로 탐험</div>
-      <div class="detail-qa"><div class="detail-q">선택 직업: ${esc(d.career||'—')}</div>
-      <div class="detail-a" style="white-space:pre-wrap;">${esc(d.careerReason||'—')}</div></div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">🌟 미션 6 — 자유의 선언</div>
-      <div class="detail-qa"><div class="detail-q">배운 것 3가지</div>
-      <div class="detail-a">1. ${esc(d.l1||'—')}<br>2. ${esc(d.l2||'—')}<br>3. ${esc(d.l3||'—')}</div></div>
-      <div class="detail-qa" style="margin-top:.5rem;"><div class="detail-q">나의 다짐</div>
-      <div class="detail-a">${esc(d.pledge||'—')}</div></div>
-      ${d.comment?`<div class="detail-qa" style="margin-top:.5rem;"><div class="detail-q">선생님께 한마디</div><div class="detail-a">${esc(d.comment)}</div></div>`:''}
-    </div>
-
-    <div style="font-size:.75rem;color:var(--text3);text-align:right;margin-top:.5rem;">
-      제출 시간: ${esc(d.submittedAtLocal||'—')}
-    </div>
-  `;
-  document.getElementById('modal-overlay').classList.add('show');
-}
-
-function closeModal(e){
-  if(e && e.target!==document.getElementById('modal-overlay')) return;
-  document.getElementById('modal-overlay').classList.remove('show');
-}
-
-/* ─── CSV EXPORT ─── */
-function exportCSV(){
-  if(allData.length===0){ alert('내보낼 데이터가 없습니다.'); return; }
-
-  const headers = ['이름','학반','번호','역할','역할이유','인상장소','감정','현장관찰','편지받는이','편지내용','시나리오선택','시나리오이유','선택직업','직업이유','배운것1','배운것2','배운것3','나의다짐','만족도','선생님께한마디','제출시간'];
-  const cols    = ['name','class','number','role','roleReason','location','emotion','obs','recipient','letter','scenario','scenarioReason','career','careerReason','l1','l2','l3','pledge','rating','comment','submittedAtLocal'];
-
-  const csvRows = [headers.join(',')];
-  allData.forEach(d=>{
-    const row = cols.map(c=>{
-      let v = c==='role' ? (ROLE_NAMES[d[c]]||d[c]||'') : (d[c]||'');
-      v = String(v).replace(/\r?\n/g,' ');
-      if(v.includes(',') || v.includes('"') || v.includes('\n')) v = '"'+v.replace(/"/g,'""')+'"';
-      return v;
+  function exportCSV() {
+    if(allData.length === 0) return alert('데이터가 없습니다.');
+    const headers = ['이름','학반','번호','M1_직업','M1_이유','M2_의지','M3_기호','M4_타음','M5_지도','M6_단어','M7_시간표','M8_수감번호','M9_유언장','M10_미래직업','M10_나의다짐','제출시간'];
+    const cols = ['name','class','number','m1_job','m1_reason','m2_ans','m3_pass','m4_pass','m5_pass','m6_pass','m7_pass','m8_pass','m9_will','m10_career','m10_pledge','submittedAtLocal'];
+    
+    const rows = [headers.join(',')];
+    allData.forEach(d => {
+      const r = cols.map(c => {
+        let v = String(d[c]||'').replace(/\n/g, ' ');
+        if(v.includes(',') || v.includes('"')) v = '"' + v.replace(/"/g, '""') + '"';
+        return v;
+      });
+      rows.push(r.join(','));
     });
-    csvRows.push(row.join(','));
-  });
 
-  const BOM = '\uFEFF'; // UTF-8 BOM for Excel Korean support
-  const blob = new Blob([BOM+csvRows.join('\n')], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url;
-  const date = new Date().toLocaleDateString('ko-KR').replace(/\./g,'').replace(/ /g,'');
-  a.download=`서대문탈출작전_활동지_${date}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + rows.join('\n')], {type: 'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `서대문탈출_8단계_데이터_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+
+  // 초기 로드
+  window.onload = loadData;
 </script>
 </body>
 </html>
