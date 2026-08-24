@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#050301">
+  <title>🔓 서대문 탈출 작전 | 진로체험 활동지</title>
+  <meta name="description" content="서대문형무소 진로체험 — 1919년 독립운동가가 되어 6개의 열쇠를 모아 탈출하라!">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700;900&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase 9 Compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    /* ─────────────────── VARIABLES ─────────────────── */
+    :root {
+      --black:     #050301;
+      --dark:      #0d0804;
+      --cell:      #1a1108;
+      --stone:     #2f2418;
+      --stone2:    #3d3020;
+      --gold:      #c9a227;
+      --gold-l:    #f0d060;
+      --gold-d:    #7a6218;
+      --cream:     #f5e6cc;
+      --parch:     #e8d5a3;
+      --parch-d:   #c4a96a;
+      --red:       #8b1a1a;
+      --red-l:     #c41e3a;
+    }
+
+    /* ─────────────────── RESET ─────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+      background: var(--black);
+      color: var(--cream);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Prison bar overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(90deg,
+        transparent 0, transparent 58px,
+        rgba(0,0,0,0.35) 58px, rgba(0,0,0,0.35) 64px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─────────────────── SCREENS ─────────────────── */
+    .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+    .screen.active { display: flex; flex-direction: column; }
+    .slide-in { animation: slideIn .55s cubic-bezier(.4,0,.2,1) both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─────────────────── INTRO ─────────────────── */
+    #screen-intro {
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem 1.5rem;
+      background: radial-gradient(ellipse 120% 80% at 50% 30%, #1a0800 0%, #050301 70%);
+    }
+    .torch { font-size: 3.5rem; animation: flicker 2.5s ease-in-out infinite; }
+    @keyframes flicker {
+      0%,100%{ text-shadow:0 0 20px #ff8c00,0 0 50px #ff5500; transform:scale(1); }
+      33%    { text-shadow:0 0 10px #ff8c00; transform:scale(.97) rotate(-1deg); }
+      66%    { text-shadow:0 0 40px #ff8c00,0 0 80px #ff3300; transform:scale(1.03) rotate(1deg); }
+    }
+    .intro-year {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(3.5rem, 10vw, 6.5rem);
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(201,162,39,.6), 0 3px 6px rgba(0,0,0,.9);
+      letter-spacing: .2em;
+      line-height: 1;
+      animation: popIn .8s cubic-bezier(.4,0,.2,1) both;
+    }
+    @keyframes popIn {
+      from{ opacity:0; transform:scale(.7); }
+      70% { transform:scale(1.05); }
+      to  { opacity:1; transform:scale(1); }
+    }
+    .intro-tagline {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(.9rem, 3vw, 1.2rem);
+      color: var(--parch);
+      letter-spacing: .2em;
+      margin: .4rem 0 1.8rem;
+      opacity: .85;
+    }
+    .intro-story {
+      max-width: 520px;
+      background: rgba(15,8,2,.85);
+      border: 1px solid var(--gold-d);
+      border-radius: 10px;
+      padding: 1.4rem 1.6rem;
+      margin: 0 auto 1.6rem;
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(.83rem, 2.5vw, .98rem);
+      line-height: 2.1;
+      color: var(--parch);
+      text-align: left;
+      position: relative;
+    }
+    .intro-story::before {
+      content: '📜';
+      position: absolute; top: -14px; left: 50%;
+      transform: translateX(-50%); font-size: 1.4rem;
+    }
+    .stats-row {
+      display: flex; gap: 1rem; justify-content: center;
+      flex-wrap: wrap; margin: .8rem 0 1.6rem;
+    }
+    .stat-box {
+      background: rgba(201,162,39,.1);
+      border: 1px solid var(--gold-d);
+      border-radius: 10px;
+      padding: .6rem 1.1rem;
+      text-align: center; min-width: 90px;
+    }
+    .stat-n { font-family:'Noto Serif KR',serif; font-size:1.5rem; font-weight:900; color:var(--gold); }
+    .stat-l { font-size:.72rem; color:var(--parch-d); display:block; margin-top:.1rem; }
+
+    /* ─────────────────── BUTTONS ─────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      border: none; border-radius: 50px; cursor: pointer;
+      font-family: 'Nanum Gothic', sans-serif; font-weight: 800;
+      transition: all .25s ease; position: relative; overflow: hidden;
+      text-decoration: none;
+    }
+    .btn::after {
+      content: '';
+      position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%);
+      transform: translateX(-120%); transition: transform .5s;
+    }
+    .btn:hover::after { transform: translateX(120%); }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, #9a7010 100%);
+      color: var(--black);
+      padding: .9rem 2.4rem;
+      font-size: clamp(.95rem, 3vw, 1.1rem);
+      box-shadow: 0 4px 24px rgba(201,162,39,.4), 0 2px 8px rgba(0,0,0,.6);
+    }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(201,162,39,.6); }
+    .btn-red {
+      background: linear-gradient(135deg, var(--red-l) 0%, #6b0f1a 100%);
+      color: #fff;
+      padding: .9rem 2.4rem;
+      font-size: clamp(.95rem, 3vw, 1.1rem);
+      box-shadow: 0 4px 24px rgba(139,26,26,.5);
+    }
+    .btn-red:hover { transform: translateY(-2px); }
+    .btn-ghost {
+      background: transparent; color: var(--parch-d);
+      border: 1px solid var(--stone2);
+      padding: .7rem 1.6rem; font-size: .88rem;
+    }
+    .btn-ghost:hover { border-color: var(--gold-d); color: var(--gold); }
+    .btn-full { width: 100%; }
+
+    /* ─────────────────── SETUP ─────────────────── */
+    #screen-setup {
+      background: linear-gradient(160deg, var(--dark) 0%, var(--cell) 100%);
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .setup-card {
+      background: rgba(20,11,3,.9);
+      border: 1px solid var(--gold-d);
+      border-radius: 16px; padding: 2rem;
+      max-width: 440px; width: 100%;
+      box-shadow: 0 0 50px rgba(201,162,39,.12), 0 20px 60px rgba(0,0,0,.8);
+    }
+    .card-icon { text-align:center; font-size:2.8rem; margin-bottom:.6rem; }
+    .card-title {
+      font-family:'Noto Serif KR',serif; font-size:1.4rem;
+      font-weight:700; color:var(--gold); text-align:center; margin-bottom:.2rem;
+    }
+    .card-sub { font-size:.82rem; color:var(--parch-d); text-align:center; margin-bottom:1.2rem; }
+
+    .form-g { margin-bottom: .9rem; }
+    .form-l {
+      display:block; font-size:.8rem; color:var(--parch-d);
+      font-weight:700; margin-bottom:.35rem; letter-spacing:.05em;
+    }
+    .form-i {
+      width:100%; background:rgba(0,0,0,.45); border:1px solid var(--stone2);
+      border-radius:8px; padding:.72rem 1rem; color:var(--cream);
+      font-family:'Nanum Gothic',sans-serif; font-size:.98rem;
+      outline:none; transition:border-color .3s;
+    }
+    .form-i:focus { border-color:var(--gold-d); background:rgba(201,162,39,.04); }
+    .form-i::placeholder { color:rgba(245,230,204,.28); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+
+    /* ─────────────────── PROGRESS ─────────────────── */
+    #progress-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(5,3,1,.97);
+      border-bottom: 1px solid var(--stone);
+      padding: .55rem 1rem;
+      backdrop-filter: blur(12px);
+      display: none;
+    }
+    .keys-row { display:flex; gap:.4rem; justify-content:center; margin-bottom:.35rem; }
+    .key { font-size:1.2rem; opacity:.18; filter:grayscale(100%); transition:all .5s; }
+    .key.got { opacity:1; filter:none; }
+    .key.got.new-key { animation:keyPop .6s ease-out; }
+    @keyframes keyPop {
+      0%  { transform:scale(2.2) rotate(-15deg); filter:brightness(3); }
+      60% { transform:scale(1.15) rotate(5deg); }
+      100%{ transform:scale(1) rotate(0); }
+    }
+    .prog-outer { height:4px; background:var(--stone); border-radius:2px; overflow:hidden; }
+    .prog-inner {
+      height:100%; width:0;
+      background: linear-gradient(90deg, var(--gold-d), var(--gold));
+      border-radius:2px; transition:width .9s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 8px var(--gold);
+    }
+    .prog-txt { font-size:.68rem; color:var(--gold-d); text-align:center; margin-top:.25rem; letter-spacing:.08em; }
+
+    /* ─────────────────── MISSION WRAPPER ─────────────────── */
+    .mission-wrap {
+      flex:1; padding: 1.4rem 1.2rem 2rem;
+      max-width: 600px; margin: 0 auto; width:100%;
+    }
+    .m-head { text-align:center; margin-bottom:1.3rem; }
+    .m-badge {
+      display:inline-flex; align-items:center; gap:.35rem;
+      background:rgba(201,162,39,.13); border:1px solid var(--gold-d);
+      border-radius:50px; padding:.28rem .75rem;
+      font-size:.72rem; color:var(--gold); letter-spacing:.1em;
+      font-weight:700; margin-bottom:.55rem;
+    }
+    .m-title {
+      font-family:'Noto Serif KR',serif;
+      font-size:clamp(1.35rem,4.5vw,1.9rem);
+      font-weight:700; color:var(--cream); margin-bottom:.3rem; line-height:1.3;
+    }
+    .m-sub { font-size:.88rem; color:var(--parch-d); line-height:1.7; }
+    .divider { height:1px; background:linear-gradient(90deg,transparent,var(--gold-d),transparent); margin:1.1rem 0; }
+    .sec-label { font-size:.75rem; color:var(--gold-d); text-transform:uppercase; letter-spacing:.15em; font-weight:700; margin-bottom:.55rem; }
+
+    /* ─────────────────── ROLE CARDS ─────────────────── */
+    .role-grid { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin:.6rem 0; }
+    .role-card {
+      background:rgba(26,17,8,.85); border:2px solid var(--stone2);
+      border-radius:12px; padding:.9rem .7rem;
+      cursor:pointer; transition:all .25s; text-align:center;
+    }
+    .role-card:hover { border-color:var(--gold-d); background:rgba(201,162,39,.07); transform:translateY(-2px); }
+    .role-card.sel { border-color:var(--gold); background:rgba(201,162,39,.14); box-shadow:0 0 18px rgba(201,162,39,.25); }
+    .role-card .ri { font-size:1.9rem; margin-bottom:.3rem; }
+    .role-card .rn { font-family:'Noto Serif KR',serif; font-size:.88rem; font-weight:700; color:var(--cream); margin-bottom:.25rem; }
+    .role-card .rd { font-size:.68rem; color:var(--parch-d); line-height:1.5; }
+
+    /* ─────────────────── LOCATION CARDS ─────────────────── */
+    .loc-grid { display:grid; grid-template-columns:1fr 1fr; gap:.65rem; margin:.6rem 0; }
+    .loc-card {
+      background:rgba(26,17,8,.85); border:2px solid var(--stone2);
+      border-radius:12px; padding:.75rem .6rem;
+      cursor:pointer; transition:all .25s; text-align:center;
+    }
+    .loc-card:hover { border-color:var(--gold-d); transform:translateY(-2px); }
+    .loc-card.sel { border-color:var(--gold); background:rgba(201,162,39,.12); }
+    .loc-card .li { font-size:1.7rem; margin-bottom:.25rem; }
+    .loc-card .ln { font-size:.82rem; font-weight:700; color:var(--cream); margin-bottom:.2rem; }
+    .loc-card .ld { font-size:.67rem; color:var(--parch-d); line-height:1.4; }
+
+    /* ─────────────────── TAGS / CHIPS ─────────────────── */
+    .tag-row { display:flex; flex-wrap:wrap; gap:.4rem; }
+    .tag {
+      background:rgba(26,17,8,.85); border:1px solid var(--stone2);
+      border-radius:50px; padding:.38rem .85rem;
+      font-size:.78rem; cursor:pointer; transition:all .2s;
+      color:var(--parch);
+    }
+    .tag:hover { border-color:var(--gold-d); color:var(--gold); }
+    .tag.sel { background:rgba(201,162,39,.18); border-color:var(--gold); color:var(--gold); font-weight:700; }
+
+    /* ─────────────────── TEXTAREA / INPUT ─────────────────── */
+    .ta {
+      width:100%; background:rgba(0,0,0,.42); border:1px solid var(--stone2);
+      border-radius:10px; padding:.85rem; color:var(--cream);
+      font-family:'Noto Serif KR',serif; font-size:.93rem;
+      line-height:1.9; resize:vertical; min-height:110px;
+      outline:none; transition:border-color .3s;
+    }
+    .ta:focus { border-color:var(--gold-d); }
+    .ta::placeholder { color:rgba(245,230,204,.28); font-style:italic; }
+    .char-cnt { font-size:.72rem; color:var(--parch-d); text-align:right; margin-top:.25rem; }
+    .char-cnt.ok { color:#6bcf7f; }
+
+    /* ─────────────────── INFO BOX ─────────────────── */
+    .info-box {
+      background:rgba(201,162,39,.07);
+      border-left:3px solid var(--gold-d);
+      border-radius:0 8px 8px 0;
+      padding:.8rem 1rem; margin:.8rem 0;
+      font-size:.83rem; color:var(--parch); line-height:1.75;
+    }
+    .info-box strong { color:var(--gold); font-style:normal; }
+    .info-title { font-family:'Noto Serif KR',serif; font-size:.88rem; font-weight:700; color:var(--gold); margin-bottom:.35rem; }
+
+    /* ─────────────────── SCENARIO ─────────────────── */
+    .sc-card {
+      background:rgba(26,17,8,.85); border:2px solid var(--stone2);
+      border-radius:12px; padding:.95rem 1.1rem;
+      cursor:pointer; transition:all .25s; margin-bottom:.65rem;
+      display:flex; align-items:flex-start; gap:.9rem;
+    }
+    .sc-card:hover { border-color:var(--gold-d); background:rgba(201,162,39,.07); transform:translateX(4px); }
+    .sc-card.sel { border-color:var(--gold); background:rgba(201,162,39,.12); }
+    .sc-letter { font-family:'Noto Serif KR',serif; font-size:1.2rem; font-weight:900; color:var(--gold); min-width:28px; }
+    .sc-text { font-size:.88rem; color:var(--parch); line-height:1.7; }
+    .reveal {
+      background:rgba(139,26,26,.15); border:1px solid rgba(139,26,26,.4);
+      border-radius:10px; padding:.9rem 1rem; margin-top:.2rem; margin-bottom:.65rem;
+      display:none;
+    }
+    .reveal.shown { display:block; animation:revealIn .4s ease-out; }
+    @keyframes revealIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .reveal-title { color:#e88; font-size:.8rem; font-weight:700; margin-bottom:.35rem; }
+    .reveal-text { font-size:.8rem; color:var(--parch); line-height:1.7; }
+
+    /* ─────────────────── CAREER ─────────────────── */
+    .career-sec { margin-bottom:.9rem; }
+    .career-sec-title { font-size:.75rem; color:var(--gold-d); text-transform:uppercase; letter-spacing:.15em; font-weight:700; margin-bottom:.4rem; }
+    .chips { display:flex; flex-wrap:wrap; gap:.38rem; }
+    .chip {
+      background:rgba(26,17,8,.85); border:1px solid var(--stone2);
+      border-radius:50px; padding:.38rem .8rem;
+      font-size:.78rem; cursor:pointer; transition:all .2s; color:var(--parch);
+    }
+    .chip:hover { border-color:var(--gold-d); color:var(--gold); }
+    .chip.sel { background:rgba(201,162,39,.18); border-color:var(--gold); color:var(--gold); font-weight:700; }
+
+    /* ─────────────────── STAR ─────────────────── */
+    .star-row { display:flex; gap:.5rem; justify-content:center; margin:.6rem 0; }
+    .star-btn { font-size:2.1rem; cursor:pointer; opacity:.22; background:none; border:none; line-height:1; transition:all .2s; }
+    .star-btn.on { opacity:1; }
+    .star-btn.on.new-star { animation:starPop .3s ease-out; }
+    @keyframes starPop { 0%{transform:scale(1.7)} 100%{transform:scale(1)} }
+
+    /* ─────────────────── SUCCESS ─────────────────── */
+    #screen-success {
+      background:radial-gradient(ellipse 130% 80% at 50% 20%, #1f0a00 0%, #050301 75%);
+      align-items:center; justify-content:center; text-align:center; padding:2rem 1.5rem;
+      position:relative; overflow:hidden;
+    }
+    #fw-stage { position:absolute; inset:0; pointer-events:none; }
+    .fw-dot { position:absolute; border-radius:50%; width:7px; height:7px; animation:fwPop 1.6s ease-out forwards; }
+    @keyframes fwPop { 0%{transform:scale(0);opacity:1} 100%{transform:scale(10);opacity:0} }
+    .success-trophy { font-size:5.5rem; animation:trophyIn 1s cubic-bezier(.4,0,.2,1); margin-bottom:.7rem; }
+    @keyframes trophyIn {
+      0%  { transform:scale(0) rotate(-180deg); opacity:0; }
+      60% { transform:scale(1.2) rotate(10deg); }
+      100%{ transform:scale(1) rotate(0); opacity:1; }
+    }
+    .success-title {
+      font-family:'Noto Serif KR',serif;
+      font-size:clamp(2rem,7vw,3.2rem); font-weight:900;
+      color:var(--gold); text-shadow:0 0 35px rgba(201,162,39,.6);
+      margin-bottom:.4rem;
+    }
+    .success-sub { font-size:clamp(.95rem,3vw,1.2rem); color:var(--cream); margin-bottom:1.4rem; }
+    .certificate {
+      max-width:460px; background:rgba(16,9,2,.92);
+      border:2px solid var(--gold-d); border-radius:14px;
+      padding:1.6rem; margin:0 auto 1.6rem; position:relative;
+    }
+    .certificate::before,.certificate::after { content:'✦'; position:absolute; font-size:.9rem; color:var(--gold-d); }
+    .certificate::before { top:.5rem; left:.6rem; }
+    .certificate::after  { bottom:.5rem; right:.6rem; }
+    .cert-ttl { font-family:'Noto Serif KR',serif; font-size:.82rem; color:var(--gold-d); letter-spacing:.18em; margin-bottom:.7rem; }
+    .cert-name { font-family:'Noto Serif KR',serif; font-size:2rem; font-weight:900; color:var(--gold); }
+    .cert-role { font-size:.95rem; color:var(--cream); margin:.4rem 0; }
+    .cert-seal { font-size:2.8rem; margin:.4rem 0; }
+    .cert-date { font-size:.75rem; color:var(--parch-d); }
+
+    /* ─────────────────── LOADING ─────────────────── */
+    #loading { display:none; position:fixed; inset:0; background:rgba(5,3,1,.93); z-index:9999; align-items:center; justify-content:center; flex-direction:column; gap:1rem; }
+    #loading.show { display:flex; }
+    .spinner { font-size:3rem; animation:spin 1.2s linear infinite; }
+    @keyframes spin { to{ transform:rotate(360deg); } }
+
+    /* ─────────────────── TOAST ─────────────────── */
+    .toast {
+      position:fixed; bottom:1.8rem; left:50%;
+      transform:translateX(-50%); max-width:90vw;
+      background:rgba(26,17,8,.97); border:1px solid var(--gold-d);
+      color:var(--cream); padding:.72rem 1.4rem;
+      border-radius:50px; font-size:.87rem; z-index:9998;
+      box-shadow:0 4px 20px rgba(0,0,0,.7);
+      animation:toastAnim 3s forwards;
+      white-space:nowrap;
+    }
+    @keyframes toastAnim {
+      0%  { opacity:0; transform:translateX(-50%) translateY(16px); }
+      12% { opacity:1; transform:translateX(-50%) translateY(0); }
+      75% { opacity:1; }
+      100%{ opacity:0; transform:translateX(-50%) translateY(-8px); }
+    }
+
+    /* ─────────────────── MISC ─────────────────── */
+    .shake { animation:shake .4s ease-out; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%,75%{transform:translateX(-6px)} 50%{transform:translateX(6px)} }
+
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--black); }
+    ::-webkit-scrollbar-thumb { background:var(--stone2); border-radius:3px; }
+
+    @media(max-width:360px){ .role-grid,.loc-grid{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     INTRO
+══════════════════════════════════════════ -->
+<div id="screen-intro" class="screen active">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:2rem 1.5rem;text-align:center;">
+    <div class="torch">🔦</div>
+    <div class="intro-year">1919</div>
+    <div class="intro-tagline">서대문형무소 탈출 작전</div>
+
+    <div class="intro-story">
+      <strong style="color:var(--gold);">[ 비밀 지령서 ]</strong><br><br>
+      당신은 <strong>3·1 독립운동</strong>에 참여한 독립운동가입니다.<br>
+      일제에 의해 체포되어 <strong>서대문형무소</strong>에 수감되었습니다.<br><br>
+      탈출하려면 <strong style="color:var(--gold);">6개의 비밀 미션</strong>을 완수해야 합니다.<br>
+      미션을 완료할 때마다 🗝️ <strong>열쇠</strong>를 획득합니다.<br><br>
+      <strong style="color:var(--gold);">열쇠 6개를 모아 자유를 되찾아라!</strong>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-n">6</div>
+        <span class="stat-l">탈출 미션</span>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">🗝️×6</div>
+        <span class="stat-l">수집할 열쇠</span>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">📜</div>
+        <span class="stat-l">독립 증서</span>
+      </div>
+    </div>
+
+    <button class="btn btn-gold" onclick="showScreen('setup')" style="font-size:1.05rem;">
+      ⚔️ 작전 개시!
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SETUP
+══════════════════════════════════════════ -->
+<div id="screen-setup" class="screen">
+  <div style="display:flex;align-items:center;justify-content:center;flex:1;padding:1.5rem;">
+    <div class="setup-card slide-in" id="setup-card">
+      <div class="card-icon">🪪</div>
+      <div class="card-title">신분 확인서</div>
+      <div class="card-sub">독립운동가로서 신원을 등록하시오</div>
+      <div class="divider"></div>
+
+      <div class="form-g">
+        <label class="form-l" for="inp-name">🕵️ 성명 (실명)</label>
+        <input id="inp-name" class="form-i" type="text" placeholder="예: 홍길동" maxlength="10">
+      </div>
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-l" for="inp-class">📋 학반</label>
+          <input id="inp-class" class="form-i" type="text" placeholder="예: 3-2" maxlength="6">
+        </div>
+        <div class="form-g">
+          <label class="form-l" for="inp-num">🔢 번호</label>
+          <input id="inp-num" class="form-i" type="number" placeholder="15" min="1" max="50">
+        </div>
+      </div>
+      <button class="btn btn-gold btn-full" style="margin-top:.5rem;" onclick="startGame()">🚀 임무 시작!</button>
+      <button class="btn btn-ghost btn-full" style="margin-top:.5rem;" onclick="showScreen('intro')">← 돌아가기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PROGRESS BAR
+══════════════════════════════════════════ -->
+<div id="progress-bar">
+  <div class="keys-row">
+    <span class="key" id="k1">🗝️</span>
+    <span class="key" id="k2">🗝️</span>
+    <span class="key" id="k3">🗝️</span>
+    <span class="key" id="k4">🗝️</span>
+    <span class="key" id="k5">🗝️</span>
+    <span class="key" id="k6">🗝️</span>
+  </div>
+  <div class="prog-outer"><div class="prog-inner" id="prog-fill"></div></div>
+  <div class="prog-txt" id="prog-txt">작전 시작!</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MISSION 1 — 나는 누구인가?
+══════════════════════════════════════════ -->
+<div id="screen-m1" class="screen">
+  <div class="mission-wrap slide-in">
+    <div class="m-head">
+      <div class="m-badge">🔐 미션 1 / 6 — 정체 확인</div>
+      <div class="m-title">나는 누구인가?</div>
+      <div class="m-sub">독립운동가로서 나의 역할을 선택하라.<br>이것이 탈출의 첫 번째 열쇠다.</div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-title">🕵️ 당신의 임무는?</div>
+      독립운동에는 총을 든 투사만 있는 게 아닙니다. 글을 쓰는 기자, 정의를 외치는 변호사, 학생을 가르치는 교사… 모두 독립운동가였습니다. 당신은 어떤 역할로 싸우겠습니까?
+    </div>
+
+    <div class="sec-label">⚔️ 나의 독립운동 역할 선택</div>
+    <div class="role-grid" id="role-grid">
+      <div class="role-card" data-role="journalist" onclick="selRole(this)">
+        <div class="ri">🗞️</div>
+        <div class="rn">비밀 기자</div>
+        <div class="rd">독립신문을 인쇄·배포하며 진실을 알린다</div>
+      </div>
+      <div class="role-card" data-role="lawyer" onclick="selRole(this)">
+        <div class="ri">⚖️</div>
+        <div class="rn">독립 변호사</div>
+        <div class="rd">동료들을 법정에서 변호하며 정의를 세운다</div>
+      </div>
+      <div class="role-card" data-role="teacher" onclick="selRole(this)">
+        <div class="ri">📚</div>
+        <div class="rn">비밀 교사</div>
+        <div class="rd">아이들에게 역사와 독립정신을 가르친다</div>
+      </div>
+      <div class="role-card" data-role="artist" onclick="selRole(this)">
+        <div class="ri">🎨</div>
+        <div class="rn">독립 예술가</div>
+        <div class="rd">그림과 시로 독립 의지를 세상에 전한다</div>
+      </div>
+      <div class="role-card" data-role="doctor" onclick="selRole(this)">
+        <div class="ri">🏥</div>
+        <div class="rn">독립군 의사</div>
+        <div class="rd">부상당한 동지들을 치료하며 곁을 지킨다</div>
+      </div>
+      <div class="role-card" data-role="historian" onclick="selRole(this)">
+        <div class="ri">📜</div>
+        <div class="rn">역사 기록가</div>
+        <div class="rd">독립운동의 기록을 남겨 후대에 전한다</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sec-label">✍️ 이 역할을 선택한 이유</div>
+    <textarea class="ta" id="m1-reason" placeholder="왜 이 역할을 선택했나요? 이 역할이 독립운동에서 왜 중요하다고 생각하나요?" rows="3"></textarea>
+
+    <button class="btn btn-gold btn-full" style="margin-top:1rem;" onclick="done(1)">🗝️ 첫 번째 열쇠 획득!</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MISSION 2 — 현장 수사
+══════════════════════════════════════════ -->
+<div id="screen-m2" class="screen">
+  <div class="mission-wrap slide-in">
+    <div class="m-head">
+      <div class="m-badge">🔐 미션 2 / 6 — 현장 수사</div>
+      <div class="m-title">눈앞의 역사를 기록하라</div>
+      <div class="m-sub">이 형무소에서 살아남으려면<br>이곳을 알아야 한다. 네가 본 것을 기록하라.</div>
+    </div>
+
+    <div class="sec-label">📍 가장 인상 깊었던 장소</div>
+    <div class="loc-grid" id="loc-grid">
+      <div class="loc-card" data-loc="옥사(감방)" onclick="selLoc(this)">
+        <div class="li">🏚️</div>
+        <div class="ln">옥사 (감방)</div>
+        <div class="ld">수감자들이 갇혀 있던 좁은 감방</div>
+      </div>
+      <div class="loc-card" data-loc="사형장" onclick="selLoc(this)">
+        <div class="li">🪢</div>
+        <div class="ln">사형장</div>
+        <div class="ld">독립운동가들이 순국한 장소</div>
+      </div>
+      <div class="loc-card" data-loc="격리실·고문실" onclick="selLoc(this)">
+        <div class="li">🚪</div>
+        <div class="ln">격리실·고문실</div>
+        <div class="ld">가혹한 고문이 행해진 공간</div>
+      </div>
+      <div class="loc-card" data-loc="여옥사" onclick="selLoc(this)">
+        <div class="li">🌸</div>
+        <div class="ln">여옥사</div>
+        <div class="ld">유관순 열사 등이 수감된 여성 감방</div>
+      </div>
+      <div class="loc-card" data-loc="지하감옥" onclick="selLoc(this)">
+        <div class="li">⬇️</div>
+        <div class="ln">지하 감옥</div>
+        <div class="ld">어둠 속에 갇힌 독방 공간</div>
+      </div>
+      <div class="loc-card" data-loc="역사전시관" onclick="selLoc(this)">
+        <div class="li">🏛️</div>
+        <div class="ln">역사 전시관</div>
+        <div class="ld">독립운동 역사가 전시된 공간</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sec-label">💭 그 장소에서 느낀 감정</div>
+    <div class="tag-row" id="emo-row">
+      <span class="tag" onclick="selTag(this,'emo')">😢 슬픔</span>
+      <span class="tag" onclick="selTag(this,'emo')">😡 분노</span>
+      <span class="tag" onclick="selTag(this,'emo')">😮 놀람</span>
+      <span class="tag" onclick="selTag(this,'emo')">😔 숙연함</span>
+      <span class="tag" onclick="selTag(this,'emo')">💪 존경심</span>
+      <span class="tag" onclick="selTag(this,'emo')">😰 두려움</span>
+      <span class="tag" onclick="selTag(this,'emo')">🙏 감사함</span>
+      <span class="tag" onclick="selTag(this,'emo')">🔥 결의</span>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sec-label">✍️ 그 장소에서 보고 느낀 것을 기록하라</div>
+    <textarea class="ta" id="m2-obs" placeholder="직접 눈으로 보고 느낀 것을 생생하게 기록해주세요. 무엇이 가장 기억에 남나요?" rows="4"></textarea>
+
+    <button class="btn btn-gold btn-full" style="margin-top:1rem;" onclick="done(2)">🗝️ 두 번째 열쇠 획득!</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MISSION 3 — 비밀 편지
+══════════════════════════════════════════ -->
+<div id="screen-m3" class="screen">
+  <div class="mission-wrap slide-in">
+    <div class="m-head">
+      <div class="m-badge">🔐 미션 3 / 6 — 비밀 편지</div>
+      <div class="m-title">동지에게 편지를 써라</div>
+      <div class="m-sub">감옥 밖 동지에게 비밀 편지를 전달해야 한다.<br>당신의 마음을 담아 글을 써라.</div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-title">✉️ 편지를 보낼 독립운동가를 선택하세요</div>
+      <div class="tag-row" id="rcpt-row" style="margin-top:.5rem;">
+        <span class="tag" onclick="selRcpt(this,'유관순 열사')">유관순 열사</span>
+        <span class="tag" onclick="selRcpt(this,'안중근 의사')">안중근 의사</span>
+        <span class="tag" onclick="selRcpt(this,'김구 선생님')">김구 선생님</span>
+        <span class="tag" onclick="selRcpt(this,'윤봉길 의사')">윤봉길 의사</span>
+        <span class="tag" onclick="selRcpt(this,'나의 동지')">나의 동지</span>
+      </div>
+    </div>
+
+    <div id="m3-opening" style="font-family:'Noto Serif KR',serif;font-size:.9rem;color:var(--gold);margin:.8rem 0 .4rem;min-height:1.4rem;"></div>
+    <div class="sec-label">✍️ 편지 내용 (최소 50자)</div>
+    <textarea class="ta" id="m3-letter" rows="6"
+      placeholder="독립운동가에게 전하고 싶은 말을 자유롭게 써보세요.&#10;감사함, 결의, 나의 다짐 등 무엇이든 괜찮습니다..."
+      oninput="cntChar('m3-letter','m3-cnt',50)"></textarea>
+    <div class="char-cnt" id="m3-cnt">0 / 최소 50자</div>
+
+    <button class="btn btn-gold btn-full" style="margin-top:1rem;" onclick="done(3)">🗝️ 세 번째 열쇠 획득!</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MISSION 4 — 갈림길
+══════════════════════════════════════════ -->
+<div id="screen-m4" class="screen">
+  <div class="mission-wrap slide-in">
+    <div class="m-head">
+      <div class="m-badge">🔐 미션 4 / 6 — 갈림길</div>
+      <div class="m-title">탈출로가 3개 있다</div>
+      <div class="m-sub">당신은 어떤 선택을 하겠는가?</div>
+    </div>
+
+    <div class="info-box" style="border-color:var(--red);background:rgba(139,26,26,.12);">
+      🚨 <strong>긴급 상황!</strong> 경비 교대 틈에 동지에게 비밀 계획을 전달해야 한다. 어떻게 할 것인가?
+    </div>
+
+    <div style="margin:1rem 0;">
+      <div class="sc-card" id="sc-A" onclick="selScenario('A')">
+        <div class="sc-letter">A</div>
+        <div class="sc-text"><strong>직접 행동</strong> — 위험을 무릅쓰고 직접 동지에게 달려가 전달한다. 빠르지만 발각 위험이 크다.</div>
+      </div>
+      <div class="reveal" id="rv-A">
+        <div class="reveal-title">📚 역사 속 이야기</div>
+        <div class="reveal-text">많은 독립운동가들이 이런 용기 있는 선택을 했습니다. 이 정신은 현대의 <strong>사회운동가, 인권활동가, 탐사 기자</strong>에게 이어집니다.</div>
+      </div>
+
+      <div class="sc-card" id="sc-B" onclick="selScenario('B')">
+        <div class="sc-letter">B</div>
+        <div class="sc-text"><strong>암호 편지</strong> — 시간이 걸리지만 암호를 만들어 편지로 전달한다. 들켜도 내용을 숨길 수 있다.</div>
+      </div>
+      <div class="reveal" id="rv-B">
+        <div class="reveal-title">📚 역사 속 이야기</div>
+        <div class="reveal-text">암호와 비밀 기록은 독립운동의 핵심 수단이었습니다. 이 능력은 현대의 <strong>암호학자, 정보보안 전문가, 기자</strong>의 역할과 닮아있습니다.</div>
+      </div>
+
+      <div class="sc-card" id="sc-C" onclick="selScenario('C')">
+        <div class="sc-letter">C</div>
+        <div class="sc-text"><strong>신뢰의 연결망</strong> — 믿을 수 있는 동지를 통해 릴레이로 전달한다. 안전하지만 시간이 걸린다.</div>
+      </div>
+      <div class="reveal" id="rv-C">
+        <div class="reveal-title">📚 역사 속 이야기</div>
+        <div class="reveal-text">독립운동의 비밀 연락망은 수많은 사람의 신뢰로 이루어졌습니다. 이 정신은 현대의 <strong>외교관, 조직 관리자, 사회지도자</strong>에게 이어집니다.</div>
+      </div>
+    </div>
+
+    <div class="sec-label">✍️ 이 선택을 한 이유는?</div>
+    <textarea class="ta" id="m4-reason" rows="3" placeholder="왜 이 방법을 선택했나요? 어떤 생각이나 가치관에 따른 선택인가요?"></textarea>
+
+    <button class="btn btn-gold btn-full" style="margin-top:1rem;" onclick="done(4)">🗝️ 네 번째 열쇠 획득!</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MISSION 5 — 자유의 직업
+══════════════════════════════════════════ -->
+<div id="screen-m5" class="screen">
+  <div class="mission-wrap slide-in">
+    <div class="m-head">
+      <div class="m-badge">🔐 미션 5 / 6 — 진로 탐험</div>
+      <div class="m-title">자유의 직업을 선택하라</div>
+      <div class="m-sub">탈출 후 독립운동을 이어갈 나의 미래.<br><strong style="color:var(--gold);">내가 꿈꾸는 직업</strong>은 무엇인가?</div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-title">💡 독립운동가의 직업, 현대에도 계속됩니다</div>
+      아래 직업들은 모두 정의와 진실을 위해 싸우는, 독립운동가의 정신을 이어받은 직업들입니다!
+    </div>
+
+    <div class="career-sec">
+      <div class="career-sec-title">📜 역사 · 문화</div>
+      <div class="chips">
+        <span class="chip" onclick="selCareer(this)">역사학자</span>
+        <span class="chip" onclick="selCareer(this)">큐레이터</span>
+        <span class="chip" onclick="selCareer(this)">문화해설사</span>
+        <span class="chip" onclick="selCareer(this)">문화재보존가</span>
+        <span class="chip" onclick="selCareer(this)">기록관리사</span>
+        <span class="chip" onclick="selCareer(this)">박물관학예사</span>
+      </div>
+    </div>
+    <div class="career-sec">
+      <div class="career-sec-title">⚖️ 법 · 인권</div>
+      <div class="chips">
+        <span class="chip" onclick="selCareer(this)">변호사</span>
+        <span class="chip" onclick="selCareer(this)">판사</span>
+        <span class="chip" onclick="selCareer(this)">검사</span>
+        <span class="chip" onclick="selCareer(this)">인권활동가</span>
+        <span class="chip" onclick="selCareer(this)">국제법전문가</span>
+      </div>
+    </div>
+    <div class="career-sec">
+      <div class="career-sec-title">📡 언론 · 미디어</div>
+      <div class="chips">
+        <span class="chip" onclick="selCareer(this)">기자/언론인</span>
+        <span class="chip" onclick="selCareer(this)">PD·방송인</span>
+        <span class="chip" onclick="selCareer(this)">다큐멘터리감독</span>
+        <span class="chip" onclick="selCareer(this)">유튜버·크리에이터</span>
+        <span class="chip" onclick="selCareer(this)">작가·소설가</span>
+      </div>
+    </div>
+    <div class="career-sec">
+      <div class="career-sec-title">📚 교육 · 사회</div>
+      <div class="chips">
+        <span class="chip" onclick="selCareer(this)">교사·교육자</span>
+        <span class="chip" onclick="selCareer(this)">사회복지사</span>
+        <span class="chip" onclick="selCareer(this)">NGO활동가</span>
+        <span class="chip" onclick="selCareer(this)">정치인</span>
+        <span class="chip" onclick="selCareer(this)">외교관</span>
+      </div>
+    </div>
+    <div class="career-sec">
+      <div class="career-sec-title">🎨 예술 · 창작</div>
+      <div class="chips">
+        <span class="chip" onclick="selCareer(this)">화가·미술가</span>
+        <span class="chip" onclick="selCareer(this)">시인·작가</span>
+        <span class="chip" onclick="selCareer(this)">영화감독</span>
+        <span class="chip" onclick="selCareer(this)">뮤지션</span>
+        <span class="chip" onclick="selCareer(this)">그래픽디자이너</span>
+      </div>
+    </div>
+    <div class="career-sec">
+      <div class="career-sec-title">🔬 과학 · 의료 · IT</div>
+      <div class="chips">
+        <span class="chip" onclick="selCareer(this)">의사·간호사</span>
+        <span class="chip" onclick="selCareer(this)">약사</span>
+        <span class="chip" onclick="selCareer(this)">연구원·과학자</span>
+        <span class="chip" onclick="selCareer(this)">IT개발자</span>
+        <span class="chip" onclick="selCareer(this)">환경전문가</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sec-label">✍️ 이 직업을 선택한 이유 & 되기 위해 필요한 것</div>
+    <textarea class="ta" id="m5-reason" rows="5" placeholder="선택한 직업에 대해 써보세요:&#10;1. 왜 이 직업이 마음에 드나요?&#10;2. 이 직업이 사회에 어떤 도움을 줄 수 있나요?&#10;3. 되기 위해 무엇을 준비해야 할까요?"></textarea>
+
+    <button class="btn btn-gold btn-full" style="margin-top:1rem;" onclick="done(5)">🗝️ 다섯 번째 열쇠 획득!</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MISSION 6 — 자유의 선언
+══════════════════════════════════════════ -->
+<div id="screen-m6" class="screen">
+  <div class="mission-wrap slide-in">
+    <div class="m-head">
+      <div class="m-badge">🔐 미션 6 / 6 — 마지막 관문!</div>
+      <div class="m-title">🌟 자유의 선언</div>
+      <div class="m-sub">마지막 열쇠만 남았다!<br>오늘의 경험을 정리하고, 자유를 향해 외쳐라!</div>
+    </div>
+
+    <div class="sec-label">💡 오늘 배운 것 3가지</div>
+    <div class="form-g" style="margin-bottom:.55rem;">
+      <input class="form-i" id="m6-l1" type="text" placeholder="1️⃣ 첫 번째로 배운 것:">
+    </div>
+    <div class="form-g" style="margin-bottom:.55rem;">
+      <input class="form-i" id="m6-l2" type="text" placeholder="2️⃣ 두 번째로 배운 것:">
+    </div>
+    <div class="form-g" style="margin-bottom:.9rem;">
+      <input class="form-i" id="m6-l3" type="text" placeholder="3️⃣ 세 번째로 배운 것:">
+    </div>
+
+    <div class="divider"></div>
+    <div class="sec-label">⚡ 나의 진로 다짐</div>
+    <textarea class="ta" id="m6-pledge" rows="4" placeholder="오늘 탐방 후 진로에 대해 어떤 다짐을 하게 되었나요?&#10;앞으로 어떻게 준비하겠습니까?"></textarea>
+
+    <div class="divider"></div>
+    <div class="sec-label">⭐ 오늘 체험 만족도</div>
+    <div class="star-row" id="star-row">
+      <button class="star-btn" data-s="1" onclick="rateStar(1)">⭐</button>
+      <button class="star-btn" data-s="2" onclick="rateStar(2)">⭐</button>
+      <button class="star-btn" data-s="3" onclick="rateStar(3)">⭐</button>
+      <button class="star-btn" data-s="4" onclick="rateStar(4)">⭐</button>
+      <button class="star-btn" data-s="5" onclick="rateStar(5)">⭐</button>
+    </div>
+    <div id="star-lbl" style="text-align:center;font-size:.8rem;color:var(--parch-d);margin-top:.3rem;">별점을 선택해주세요</div>
+
+    <div class="divider"></div>
+    <div class="sec-label">💬 선생님께 한마디 (선택)</div>
+    <textarea class="ta" id="m6-comment" rows="2" placeholder="오늘 체험 소감이나 건의사항을 자유롭게 써주세요 (선택사항)"></textarea>
+
+    <button class="btn btn-red btn-full" style="margin-top:1rem;" onclick="submitAll()">
+      🏴 탈출 완료! 제출하기
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SUCCESS
+══════════════════════════════════════════ -->
+<div id="screen-success" class="screen">
+  <canvas id="fw-stage" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:2rem 1.5rem;text-align:center;">
+    <div class="success-trophy">🏆</div>
+    <div class="success-title">탈출 성공!</div>
+    <div class="success-sub">당신은 자유를 되찾았습니다! 🕊️</div>
+
+    <div class="certificate">
+      <div class="cert-ttl">— 독립운동가 활동 증서 —</div>
+      <div class="cert-name" id="cert-name">이름</div>
+      <div class="cert-role" id="cert-role">역할</div>
+      <div class="cert-seal">🏴‍☠️</div>
+      <div class="cert-date" id="cert-date">1919년 · 서대문형무소</div>
+    </div>
+
+    <div style="font-family:'Noto Serif KR',serif;font-size:.9rem;color:var(--parch);max-width:380px;line-height:1.9;margin-bottom:1.5rem;">
+      🗝️ 6개의 열쇠를 모두 획득했습니다!<br>
+      활동지가 선생님께 전달되었습니다.<br>
+      <span style="color:var(--gold);">오늘의 역사 탐방을 기억하세요.</span>
+    </div>
+
+    <button class="btn btn-ghost" onclick="location.reload()">🔄 처음으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="spinner">⚙️</div>
+  <div style="color:var(--gold);font-family:'Noto Serif KR',serif;font-size:1.1rem;">제출 중...</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
+<script src="firebase-config.js"></script>
+<script>
+/* ─── STATE ─── */
+const G = {
+  name:'', cls:'', num:'',
+  mission:0,
+  a:{
+    role:'', roleReason:'',
+    location:'', emotion:'', obs:'',
+    recipient:'', letter:'',
+    scenario:'', scenarioReason:'',
+    career:'', careerReason:'',
+    l1:'',l2:'',l3:'',
+    pledge:'', rating:0, comment:''
+  }
+};
+
+/* ─── FIREBASE ─── */
+let db = null;
+try {
+  if(typeof firebaseConfig!=='undefined' && firebaseConfig.apiKey !== '여기에-API-키-입력'){
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }
+} catch(e){ console.warn('Firebase not init:',e); }
+
+/* ─── SCREEN ─── */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const t = document.getElementById('screen-'+id)||document.getElementById(id);
+  if(t){ t.classList.add('active'); window.scrollTo(0,0); }
+}
+
+/* ─── GAME START ─── */
+function startGame(){
+  const n=document.getElementById('inp-name').value.trim();
+  const c=document.getElementById('inp-class').value.trim();
+  const u=document.getElementById('inp-num').value.trim();
+  if(!n||!c||!u){
+    toast('⚠️ 이름, 학반, 번호를 모두 입력해주세요!');
+    document.getElementById('setup-card').classList.add('shake');
+    setTimeout(()=>document.getElementById('setup-card').classList.remove('shake'),500);
+    return;
+  }
+  G.name=n; G.cls=c; G.num=u;
+  document.getElementById('progress-bar').style.display='block';
+  setProgress(0);
+  showScreen('m1');
+}
+
+/* ─── PROGRESS ─── */
+function setProgress(n){
+  document.getElementById('prog-fill').style.width=(n/6*100)+'%';
+  document.getElementById('prog-txt').textContent =
+    n===0 ? `${G.name}님, 작전 시작!` :
+    n===6 ? '🎉 탈출 성공!' :
+    `미션 ${n}/6 완료 — 열쇠 ${n}개 획득!`;
+  for(let i=1;i<=6;i++){
+    const k=document.getElementById('k'+i);
+    if(i<=n){ if(!k.classList.contains('got')){ k.classList.add('got','new-key'); setTimeout(()=>k.classList.remove('new-key'),700); } }
+  }
+}
+
+/* ─── MISSION DONE ─── */
+function done(n){
+  if(!validate(n)) return;
+  collect(n);
+  setProgress(n);
+  toast(`🗝️ 열쇠 ${n}개 획득! 미션 ${n} 완료!`);
+  setTimeout(()=>{ if(n<6) showScreen('m'+(n+1)); },650);
+}
+
+/* ─── VALIDATE ─── */
+function validate(n){
+  if(n===1){
+    if(!G.a.role){toast('⚠️ 역할을 선택해주세요!');return false;}
+    if(!document.getElementById('m1-reason').value.trim()){toast('⚠️ 이유를 작성해주세요!');return false;}
+  }
+  if(n===2){
+    if(!G.a.location){toast('⚠️ 장소를 선택해주세요!');return false;}
+    if(!G.a.emotion){toast('⚠️ 감정을 선택해주세요!');return false;}
+    if(!document.getElementById('m2-obs').value.trim()){toast('⚠️ 관찰 내용을 작성해주세요!');return false;}
+  }
+  if(n===3){
+    if(document.getElementById('m3-letter').value.trim().length<50){toast('⚠️ 편지를 최소 50자 이상 작성해주세요!');return false;}
+  }
+  if(n===4){
+    if(!G.a.scenario){toast('⚠️ 탈출 방법을 선택해주세요!');return false;}
+    if(!document.getElementById('m4-reason').value.trim()){toast('⚠️ 이유를 작성해주세요!');return false;}
+  }
+  if(n===5){
+    if(!G.a.career){toast('⚠️ 직업을 선택해주세요!');return false;}
+    if(!document.getElementById('m5-reason').value.trim()){toast('⚠️ 이유를 작성해주세요!');return false;}
+  }
+  if(n===6){
+    if(!document.getElementById('m6-l1').value.trim()||
+       !document.getElementById('m6-l2').value.trim()||
+       !document.getElementById('m6-l3').value.trim()){toast('⚠️ 배운 것 3가지를 모두 작성해주세요!');return false;}
+    if(!document.getElementById('m6-pledge').value.trim()){toast('⚠️ 다짐을 작성해주세요!');return false;}
+    if(!G.a.rating){toast('⚠️ 별점을 선택해주세요!');return false;}
+  }
+  return true;
+}
+
+/* ─── COLLECT ─── */
+function collect(n){
+  if(n===1) G.a.roleReason=document.getElementById('m1-reason').value.trim();
+  if(n===2) G.a.obs=document.getElementById('m2-obs').value.trim();
+  if(n===3) G.a.letter=document.getElementById('m3-letter').value.trim();
+  if(n===4) G.a.scenarioReason=document.getElementById('m4-reason').value.trim();
+  if(n===5) G.a.careerReason=document.getElementById('m5-reason').value.trim();
+  if(n===6){
+    G.a.l1=document.getElementById('m6-l1').value.trim();
+    G.a.l2=document.getElementById('m6-l2').value.trim();
+    G.a.l3=document.getElementById('m6-l3').value.trim();
+    G.a.pledge=document.getElementById('m6-pledge').value.trim();
+    G.a.comment=document.getElementById('m6-comment').value.trim();
+  }
+}
+
+/* ─── SUBMIT ─── */
+async function submitAll(){
+  if(!validate(6)) return;
+  collect(6);
+
+  const loading=document.getElementById('loading');
+  loading.classList.add('show');
+
+  const roleLabel={journalist:'비밀 기자',lawyer:'독립 변호사',teacher:'비밀 교사',artist:'독립 예술가',doctor:'독립군 의사',historian:'역사 기록가'};
+
+  const data={
+    name:G.name, class:G.cls, number:G.num,
+    ...G.a,
+    submittedAtLocal: new Date().toLocaleString('ko-KR')
+  };
+
+  try{
+    if(db){
+      data.submittedAt=firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('submissions').add(data);
+    } else {
+      // localStorage fallback (demo mode)
+      const arr=JSON.parse(localStorage.getItem('sdm_submissions')||'[]');
+      data.submittedAt=new Date().toISOString();
+      arr.push(data);
+      localStorage.setItem('sdm_submissions',JSON.stringify(arr));
+    }
+
+    /* Success screen */
+    document.getElementById('cert-name').textContent=G.name;
+    document.getElementById('cert-role').textContent=(roleLabel[G.a.role]||G.a.role)+' 독립운동가';
+    document.getElementById('cert-date').textContent=`1919년 · 서대문형무소 · ${new Date().toLocaleDateString('ko-KR')} 방문`;
+    setProgress(6);
+
+    setTimeout(()=>{
+      loading.classList.remove('show');
+      document.getElementById('progress-bar').style.display='none';
+      showScreen('success');
+      launchFireworks();
+    },1400);
+  } catch(err){
+    loading.classList.remove('show');
+    console.error(err);
+    toast('⚠️ 제출 오류가 발생했습니다. 다시 시도해주세요.');
+  }
+}
+
+/* ─── FIREWORKS (canvas) ─── */
+function launchFireworks(){
+  const canvas=document.getElementById('fw-stage');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+  const colors=['#c9a227','#f0d060','#ff6b35','#ff4444','#44cc88','#ffffff'];
+  const particles=[];
+  function spawnBurst(){
+    const x=Math.random()*canvas.width;
+    const y=Math.random()*canvas.height*0.6;
+    const c=colors[Math.floor(Math.random()*colors.length)];
+    for(let i=0;i<40;i++){
+      const angle=Math.random()*Math.PI*2;
+      const speed=2+Math.random()*4;
+      particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:1,c});
+    }
+  }
+  let bursts=0;
+  const bI=setInterval(()=>{ spawnBurst(); bursts++; if(bursts>12) clearInterval(bI); },400);
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let i=particles.length-1;i>=0;i--){
+      const p=particles[i];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.08; p.life-=0.012;
+      if(p.life<=0){ particles.splice(i,1); continue; }
+      ctx.globalAlpha=p.life;
+      ctx.fillStyle=p.c;
+      ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    if(particles.length||bursts<12) requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ─── SELECTION HELPERS ─── */
+function selRole(el){
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); G.a.role=el.dataset.role;
+}
+function selLoc(el){
+  document.querySelectorAll('.loc-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); G.a.location=el.dataset.loc;
+}
+function selTag(el,group){
+  // find sibling tags in same row
+  el.closest('.tag-row').querySelectorAll('.tag').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  if(group==='emo') G.a.emotion=el.textContent.trim();
+}
+function selRcpt(el,name){
+  document.querySelectorAll('#rcpt-row .tag').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel'); G.a.recipient=name;
+  document.getElementById('m3-opening').innerHTML=`<em style="color:var(--gold-l);">${name}에게...</em>`;
+}
+function selScenario(letter){
+  ['A','B','C'].forEach(l=>{
+    document.getElementById('sc-'+l).classList.remove('sel');
+    document.getElementById('rv-'+l).classList.remove('shown');
+  });
+  document.getElementById('sc-'+letter).classList.add('sel');
+  document.getElementById('rv-'+letter).classList.add('shown');
+  G.a.scenario=letter;
+}
+function selCareer(el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); G.a.career=el.textContent.trim();
+}
+
+/* ─── STAR RATING ─── */
+const starLabels=['','별로예요 😞','그저 그래요 😐','좋았어요 🙂','재미있었어요 😊','최고였어요! 🤩'];
+function rateStar(n){
+  G.a.rating=n;
+  document.querySelectorAll('.star-btn').forEach((b,i)=>{
+    const wasOn=b.classList.contains('on');
+    b.classList.toggle('on', i<n);
+    if(i<n && !wasOn) b.classList.add('new-star');
+    setTimeout(()=>b.classList.remove('new-star'),400);
+  });
+  document.getElementById('star-lbl').textContent=starLabels[n];
+}
+
+/* ─── CHAR COUNTER ─── */
+function cntChar(inputId, cntId, min){
+  const len=document.getElementById(inputId).value.length;
+  const el=document.getElementById(cntId);
+  el.textContent=`${len} / 최소 ${min}자`;
+  el.className='char-cnt'+(len>=min?' ok':'');
+}
+
+/* ─── TOAST ─── */
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3200);
+}
+</script>
+</body>
+</html>
