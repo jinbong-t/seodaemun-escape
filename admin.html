@@ -52,42 +52,100 @@
     .detail-section { margin-bottom: 1.5rem; }
     .detail-title { font-weight: bold; color: var(--primary); border-bottom: 2px solid var(--primary-l); padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
     .detail-text { font-size: 0.95rem; line-height: 1.6; background: #f8fafc; padding: 1rem; border-radius: 6px; }
+
+    /* 탭 스타일 */
+    .tabs { display: flex; gap: 0.5rem; }
+    .tab-btn { padding: 0.5rem 1rem; border: 2px solid var(--border); border-radius: 6px; background: none; cursor: pointer; font-weight: bold; color: var(--text2); transition: all 0.2s; }
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* 사진 승인 카드 */
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+    .photo-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: box-shadow 0.2s; }
+    .photo-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .photo-card img { width: 100%; height: 200px; object-fit: cover; display: block; cursor: pointer; }
+    .photo-card-body { padding: 1rem; }
+    .photo-student-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 0.3rem; }
+    .photo-meta { font-size: 0.85rem; color: var(--text2); margin-bottom: 0.8rem; }
+    .photo-location { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 0.8rem; }
+    .photo-location.indoor { background: #dbeafe; color: #1e40af; }
+    .photo-location.outdoor { background: #dcfce7; color: #166534; }
+    .badge-approved { background: #dcfce7; color: #166534; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .btn-approve { background: #16a34a; color: white; width: 100%; padding: 0.7rem; font-size: 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+    .btn-approve:hover { background: #15803d; }
+    .btn-approve:disabled { background: #86efac; cursor: not-allowed; }
+    .photo-count-badge { background: var(--primary); color: white; border-radius: 50%; padding: 0.1rem 0.5rem; font-size: 0.8rem; margin-left: 0.3rem; }
+
+    /* 사진 확대 모달 */
+    .img-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; cursor: pointer; }
+    .img-modal-overlay.show { display: flex; }
+    .img-modal-overlay img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="header-title">📊 서대문 탈출 작전 - 요원 데이터 수합 (8단계 버전)</div>
-    <div>
+    <div class="header-title">📊 서대문 탈출 작전 - 교사 대시보드</div>
+    <div style="display:flex; gap:0.5rem; align-items:center;">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-btn-data" onclick="switchTab('data')">📋 제출 목록</button>
+        <button class="tab-btn" id="tab-btn-photo" onclick="switchTab('photo')">📸 사진 승인 <span class="photo-count-badge" id="pending-count">0</span></button>
+      </div>
       <button class="btn btn-green" onclick="exportCSV()">📥 CSV 다운로드</button>
-      <button class="btn btn-primary" onclick="loadData()">🔄 새로고침</button>
+      <button class="btn btn-primary" onclick="refreshAll()">🔄 새로고침</button>
     </div>
   </div>
 
   <main>
-    <div class="card">
-      <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">제출 목록 (총 <span id="total-count">0</span>명)</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>이름</th>
-            <th>학반/번호</th>
-            <th>M1 위장직업</th>
-            <th>M6(단어) 해독</th>
-            <th>M7(시간표) 추리</th>
-            <th>M8(여옥사) 번호</th>
-            <th>M9(사형장) 유언</th>
-            <th>M10(추모비) 다짐</th>
-            <th>제출 일시</th>
-            <th>상세 보기</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          <!-- Data goes here -->
-        </tbody>
-      </table>
+    <!-- 탭 1: 제출 목록 -->
+    <div class="tab-panel active" id="tab-data">
+      <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">제출 목록 (총 <span id="total-count">0</span>명)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>학반/번호</th>
+              <th>M1 위장직업</th>
+              <th>M6(단어) 해독</th>
+              <th>M7(시간표) 추리</th>
+              <th>M8(여옥사) 번호</th>
+              <th>M9(사형장) 유언</th>
+              <th>M10(추모비) 다짐</th>
+              <th>제출 일시</th>
+              <th>상세 보기</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- Data goes here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 탭 2: 사진 승인 -->
+    <div class="tab-panel" id="tab-photo">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="font-size: 1.2rem;">📸 인증사진 승인 대기 (<span id="photo-total">0</span>건)</h2>
+          <button class="btn btn-primary" onclick="loadPhotos()">🔄 새로고침</button>
+        </div>
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+          💡 <strong>승인 방법:</strong> 학생이 제출한 사진을 확인하고 <strong>✅ 승인</strong> 버튼을 누르면 해당 학생의 게임이 자동으로 다음 단계로 진행됩니다.
+        </div>
+        <div class="photo-grid" id="photo-grid">
+          <div style="text-align:center; color:#888; padding: 2rem; grid-column: 1/-1;">사진을 불러오는 중...</div>
+        </div>
+      </div>
     </div>
   </main>
+
+  <!-- 이미지 확대 모달 -->
+  <div class="img-modal-overlay" id="img-modal" onclick="closeImgModal()">
+    <img id="img-modal-img" src="" alt="확대 이미지">
+  </div>
 
   <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
     <div class="modal" id="modal-content">
@@ -100,7 +158,9 @@
 <script src="firebase-config.js"></script>
 <script>
   let allData = [];
+  let allPhotos = [];
   let db = null;
+  let currentTab = 'data';
 
   try {
     if(typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== '여기에-API-키-입력'){
@@ -108,6 +168,20 @@
       db = firebase.firestore();
     }
   } catch(e){ console.warn("Firebase Error", e); }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-btn-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    if(tab === 'photo') loadPhotos();
+  }
+
+  function refreshAll() {
+    loadData();
+    loadPhotos();
+  }
 
   async function loadData() {
     const tbody = document.getElementById('table-body');
@@ -222,7 +296,109 @@
   }
 
   // 초기 로드
-  window.onload = loadData;
+  window.onload = () => {
+    loadData();
+    loadPhotos();
+  };
+
+  /* ========== 사진 승인 관련 ========== */
+  async function loadPhotos() {
+    const grid = document.getElementById('photo-grid');
+    grid.innerHTML = '<div style="text-align:center; color:#888; padding: 2rem; grid-column: 1/-1;">사진을 불러오는 중... ⏳</div>';
+
+    try {
+      if(db) {
+        const snap = await db.collection('photo_missions').orderBy('submittedAt', 'desc').get();
+        allPhotos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } else {
+        allPhotos = [];
+      }
+      renderPhotos();
+    } catch(err) {
+      console.error(err);
+      grid.innerHTML = '<div style="text-align:center; color:red; padding: 2rem; grid-column: 1/-1;">사진을 불러오지 못했습니다.</div>';
+    }
+  }
+
+  function renderPhotos() {
+    const grid = document.getElementById('photo-grid');
+    const total = allPhotos.length;
+    const pending = allPhotos.filter(p => !p.approved).length;
+
+    document.getElementById('photo-total').textContent = total;
+    document.getElementById('pending-count').textContent = pending;
+
+    if(total === 0) {
+      grid.innerHTML = '<div style="text-align:center; color:#888; padding: 3rem; grid-column: 1/-1;">📭 아직 제출된 인증사진이 없습니다.</div>';
+      return;
+    }
+
+    grid.innerHTML = allPhotos.map(p => `
+      <div class="photo-card" id="photo-card-${p.id}">
+        <img src="${p.photoBase64}" alt="인증샷" onclick="openImgModal('${p.id}')" title="클릭하면 크게 볼 수 있습니다">
+        <div class="photo-card-body">
+          <div class="photo-student-name">👤 ${esc(p.studentName)}</div>
+          <div class="photo-meta">📚 ${esc(p.studentClass)} ${esc(String(p.studentNumber))}번 · ${esc(p.submittedAtLocal)}</div>
+          <div class="photo-location ${p.location}">
+            ${p.location === 'indoor' ? '🏛️ 실내 - 유관순 열사 수감방' : '🌳 실외 - 통곡의 미루나무'}
+          </div>
+          ${p.approved
+            ? '<div><span class="badge badge-approved">✅ 승인 완료</span></div>'
+            : `<button class="btn-approve" id="approve-btn-${p.id}" onclick="approvePhoto('${p.id}')">✅ 승인 (다음 미션 열기)</button>`
+          }
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function approvePhoto(photoId) {
+    const btn = document.getElementById('approve-btn-' + photoId);
+    if(!btn) return;
+    btn.textContent = '처리 중...';
+    btn.disabled = true;
+
+    try {
+      if(db) {
+        await db.collection('photo_missions').doc(photoId).update({ approved: true });
+        // 로컬 데이터도 업데이트
+        const idx = allPhotos.findIndex(p => p.id === photoId);
+        if(idx !== -1) allPhotos[idx].approved = true;
+        renderPhotos();
+        showAdminToast('✅ 승인 완료! 학생 화면이 자동으로 다음 단계로 이동합니다.');
+      }
+    } catch(err) {
+      console.error(err);
+      btn.textContent = '✅ 승인 (다음 미션 열기)';
+      btn.disabled = false;
+      showAdminToast('오류 발생: ' + err.message, true);
+    }
+  }
+
+  function openImgModal(photoId) {
+    const photo = allPhotos.find(p => p.id === photoId);
+    if(!photo) return;
+    document.getElementById('img-modal-img').src = photo.photoBase64;
+    document.getElementById('img-modal').classList.add('show');
+  }
+
+  function closeImgModal() {
+    document.getElementById('img-modal').classList.remove('show');
+  }
+
+  function showAdminToast(msg, isError = false) {
+    let toast = document.getElementById('admin-toast');
+    if(!toast) {
+      toast = document.createElement('div');
+      toast.id = 'admin-toast';
+      toast.style.cssText = 'position:fixed;bottom:2rem;right:2rem;padding:1rem 1.5rem;border-radius:8px;font-weight:bold;z-index:9999;transition:opacity 0.3s;';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.background = isError ? '#b91c1c' : '#16a34a';
+    toast.style.color = 'white';
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+  }
 </script>
 </body>
 </html>

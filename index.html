@@ -158,6 +158,99 @@
     @keyframes errorShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
     .word-grid.error { animation: errorShake 0.4s; }
 
+    /* 인증샷 미션 스타일 */
+    .location-choice {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .location-card {
+      background: rgba(0,0,0,0.6); border: 2px solid #555; border-radius: 12px;
+      padding: 1.5rem 1rem; text-align: center; cursor: pointer;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .location-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .location-card.selected { border-color: var(--gold); background: rgba(201,162,39,0.15); box-shadow: 0 0 20px rgba(201,162,39,0.3); }
+    .location-card .loc-emoji { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+    .location-card .loc-name { font-weight: bold; font-size: 1rem; color: #fff; margin-bottom: 0.3rem; }
+    .location-card .loc-desc { font-size: 0.8rem; color: #aaa; line-height: 1.4; }
+    .location-card.selected .loc-name { color: var(--gold); }
+
+    /* 업로드 영역 */
+    .upload-zone {
+      border: 2px dashed #555; border-radius: 12px; padding: 2rem 1rem;
+      text-align: center; cursor: pointer; transition: all 0.3s; margin-bottom: 1rem;
+      background: rgba(0,0,0,0.4);
+    }
+    .upload-zone:hover { border-color: var(--gold); background: rgba(201,162,39,0.05); }
+    .upload-zone.has-image { border-color: #16a34a; border-style: solid; background: rgba(22,163,74,0.1); }
+    .upload-zone input[type=file] { display: none; }
+    .upload-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 0.5rem; display: none; }
+    .upload-preview.show { display: block; margin: 0 auto; }
+
+    /* 승인 대기 화면 */
+    @keyframes pulse-wait { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
+    .waiting-icon { font-size: 4rem; animation: pulse-wait 2s infinite; display: block; margin: 1rem auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 1rem auto; }
+
+    /* ===== 긴장 이벤트 오버레이 ===== */
+    #guard-event-overlay, #keyhunt-event-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9500;
+      background: #000; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+    }
+    /* 사이렌 번쩍 배경 */
+    @keyframes siren { 0%,100%{background:rgba(180,0,0,0.0);} 50%{background:rgba(180,0,0,0.55);} }
+    .siren-bg { position: absolute; inset: 0; pointer-events: none; animation: siren 0.5s infinite; }
+    /* 간수 실루엣 슬라이드인 */
+    @keyframes guardSlide { from { transform: translateX(-120%) scaleX(-1); opacity:0; } to { transform: translateX(0) scaleX(-1); opacity:0.85; } }
+    .guard-img {
+      position: absolute; bottom: 0; left: 0; width: 55%; max-width: 500px;
+      object-fit: contain; opacity: 0;
+      animation: guardSlide 1.2s cubic-bezier(0.25,0.46,0.45,0.94) 0.5s forwards;
+      filter: brightness(0.25) sepia(1) hue-rotate(-10deg);
+    }
+    /* 카운트다운 */
+    @keyframes countPop { 0%{transform:scale(2);opacity:0;} 60%{transform:scale(1.1);opacity:1;} 100%{transform:scale(1);opacity:1;} }
+    .event-countdown {
+      font-family: var(--font-serif); font-size: 7rem; font-weight: 900;
+      color: #ff3333; text-shadow: 0 0 40px #ff0000, 0 0 80px #ff0000;
+      line-height: 1; position: relative; z-index: 10;
+      animation: countPop 0.4s ease-out;
+    }
+    .event-title {
+      font-family: var(--font-serif); font-size: 2rem; font-weight: 900;
+      color: #ff4444; letter-spacing: 0.2em; text-shadow: 0 0 20px #ff0000;
+      position: relative; z-index: 10; margin-bottom: 0.5rem;
+    }
+    .event-subtitle {
+      font-size: 1.1rem; color: #ccc; position: relative; z-index: 10;
+      margin-bottom: 2rem; line-height: 1.6;
+    }
+    .event-survived {
+      font-family: var(--font-serif); font-size: 1.8rem; font-weight: 900;
+      color: #22c55e; text-shadow: 0 0 20px #22c55e;
+      display: none; position: relative; z-index: 10;
+    }
+    /* 열쇠 탐색 이벤트 */
+    .keyhunt-area {
+      position: relative; z-index: 10; width: 100%; max-width: 500px; padding: 2rem;
+    }
+    .keyhunt-title {
+      font-family: var(--font-serif); font-size: 1.8rem; color: var(--gold);
+      text-shadow: 0 0 20px rgba(201,162,39,0.8); margin-bottom: 1rem;
+    }
+    .keyhunt-desc { font-size: 1rem; color: #ccc; margin-bottom: 2rem; line-height: 1.6; }
+    .keyhunt-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 0.8rem; margin-bottom: 1.5rem;
+    }
+    .keyhunt-cell {
+      aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 1px solid #333;
+      border-radius: 8px; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 1.5rem; transition: all 0.2s;
+    }
+    .keyhunt-cell:hover { background: rgba(201,162,39,0.15); border-color: var(--gold); }
+    .keyhunt-cell.found { background: rgba(201,162,39,0.3); border-color: var(--gold); animation: countPop 0.3s; }
+
     /* Map Puzzle */
     .map-grid {
       display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; 
@@ -199,6 +292,35 @@
   <span class="key-icon" id="k8">🗝️</span>
   <span class="key-icon" id="k9">🗝️</span>
   <span class="key-icon" id="k10">🗝️</span>
+  <span class="key-icon" id="k11">🗝️</span>
+  <span class="key-icon" id="k12">🗝️</span>
+</div>
+
+<!-- ===== 간수 출현 이벤트 오버레이 ===== -->
+<div id="guard-event-overlay">
+  <div class="siren-bg"></div>
+  <img class="guard-img" src="assets/guard_silhouette.jpg" alt="간수">
+  <div id="guard-text-area" style="position:relative; z-index:10; padding: 2rem;">
+    <div class="event-title" id="guard-title">⚠️ 간수 출현!</div>
+    <div class="event-subtitle" id="guard-subtitle">발소리가 들린다... 꼼짝 마!</div>
+    <div class="event-countdown" id="guard-countdown">3</div>
+    <div class="event-survived" id="guard-survived">살았다... 계속 이동하라!</div>
+  </div>
+  <audio id="sfx-footstep" src="https://assets.mixkit.co/active_storage/sfx/1256/1256-preview.mp3" preload="auto"></audio>
+  <audio id="sfx-heartbeat" src="https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3" preload="auto"></audio>
+</div>
+
+<!-- ===== 열쇠 탐색 이벤트 오버레이 ===== -->
+<div id="keyhunt-event-overlay" style="background: rgba(0,0,0,0.97);">
+  <div class="keyhunt-area">
+    <div class="keyhunt-title">🗝️ 어딘가에 열쇠가 숨겨져 있다!</div>
+    <div class="keyhunt-desc">
+      노역장 구석 어딘가에 동지가 몰래 숨겨둔 열쇠가 있다.<br>
+      아무도 없는 지금, 빠르게 찾아내야 한다!
+    </div>
+    <div class="keyhunt-grid" id="keyhunt-grid"></div>
+    <div id="keyhunt-result" style="display:none; font-size:1.5rem; font-weight:bold; color: var(--gold); text-shadow: 0 0 20px var(--gold);">🗝️ 찾았다! 계속 이동하라!</div>
+  </div>
 </div>
 
 <!-- ================= INTRO ================= -->
@@ -211,7 +333,7 @@
     <div class="story-text" style="text-align: left; background: rgba(20,0,0,0.6); padding: 1.5rem; border-left: 4px solid var(--red); border-right: 4px solid var(--red); font-size: 1.1rem; line-height: 1.8; text-shadow: 1px 1px 2px #000;">
       "쉿, 조용히 해! 이 지령서를 읽고 있다면, 넌 오늘 목숨을 걸어야 한다.<br><br>
       서대문 형무소에 갇힌 우리 독립군 동지들이 끔찍한 고문을 당하고 있다. 
-      네 임무는 형무소에 <strong>비밀리에 잠입</strong>하여, 동지들이 남긴 <strong>8개의 열쇠</strong>를 찾아 그들을 구출하고 무사히 <strong>탈출</strong>하는 것이다.<br><br>
+      네 임무는 형무소에 <strong>비밀리에 잠입</strong>하여, 동지들이 남긴 <strong>12개의 열쇠</strong>를 찾아 그들을 구출하고 무사히 <strong>탈출</strong>하는 것이다.<br><br>
       아프고 두려울 것이다. 하지만 조국의 얼을 품고 나아가라!"
     </div>
 
@@ -251,7 +373,7 @@
 <!-- ================= MISSION 1 ================= -->
 <div id="screen-m1" class="screen">
   <div class="content-box">
-    <div class="mission-header">MISSION 1 / 10 : 전시관 (정문)</div>
+    <div class="mission-header">MISSION 1 / 12 : 전시관 (정문)</div>
     <div class="mission-title">정체를 숨겨라!</div>
     
     <div class="story-text">
@@ -274,6 +396,37 @@
     </div>
 
     <button class="btn" onclick="checkM1()">위장 완료! (잠입)</button>
+  </div>
+</div>
+
+<!-- ================= MISSION 1.5 : 을사오적 ================= -->
+<div id="screen-m1_5" class="screen">
+  <div class="content-box">
+    <div class="mission-header">MISSION 2 / 12 : 전시관 1층 민족저항실</div>
+    <div class="mission-title">을사오적을 찾아라!</div>
+
+    <div class="story-text">
+      <div class="horror-text">민족저항실 벽면, 나라를 판 다섯 명의 얼굴이 주시경처럼 내려다보고 있다.</div>
+      1905년, 일제는 대한의 <strong>외교권을 강탈</strong>하기 위해 을사늑약을 강제로 체결하였다.<br>
+      이에 사인한 <strong>다섯 명의 매국노</strong>, 이른바 '<strong>을사오적</strong>'.<br><br>
+      이들의 죄명을 기억하는 자만이 다음 구역으로 나아갈 수 있다.
+    </div>
+
+    <div style="background: rgba(255,255,255,0.08); padding: 1rem 1.5rem; border-left: 3px solid var(--red); margin-bottom: 1.5rem; font-size:0.9rem; line-height:2;">
+      <strong>[ 을사오적 ]</strong><br>
+      외부대신 박제순 &nbsp;·&nbsp; 내부대신 이지용 &nbsp;·&nbsp; 군부대신 이근택<br>
+      <span style="color:var(--gold);">학부대신 ???</span> &nbsp;·&nbsp; 농상대신 권중현
+    </div>
+
+    <div class="input-label">🔍 을사늑약에 서명한 '학부대신'(교육장관)은 누구인가?</div>
+    <div class="grid-2" id="m1_5-grid">
+      <div class="option-card" data-val="이완용" onclick="selOption(this, 'm1_5')">이완용</div>
+      <div class="option-card" data-val="허위" onclick="selOption(this, 'm1_5')">허 위</div>
+      <div class="option-card" data-val="최익현" onclick="selOption(this, 'm1_5')">최익현</div>
+      <div class="option-card" data-val="박제순" onclick="selOption(this, 'm1_5')">박제순</div>
+    </div>
+
+    <button class="btn" onclick="checkM1_5()">매국노의 이름을 새기자!</button>
   </div>
 </div>
 
@@ -451,17 +604,71 @@
   </div>
 </div>
 
+<!-- ================= MISSION 7.5 : 의열투사 ================= -->
+<div id="screen-m7_5" class="screen">
+  <div class="content-box">
+    <div class="mission-header">MISSION 9 / 12 : 민족저항실 2층</div>
+    <div class="mission-title">의열 투사를 기억하라!</div>
+
+    <div class="story-text">
+      <div class="horror-text">2층 전시실, 네 명의 투사가 사진 속에서 당신을 바라본다.</div>
+      목숨을 버려 민족원수를 처단한 <strong>의열 투사들</strong>.<br>
+      그들의 이름과 의거를 기억하는 자만이 다음 구역의 문을 열 수 있다.<br><br>
+      아래 설명을 읽고, <strong>올바른 독립운동가</strong>를 선택하라!
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap: 1.2rem; margin-bottom: 1.5rem;">
+
+      <div style="background: rgba(255,255,255,0.06); border:1px solid #444; border-radius: 10px; padding: 1rem;">
+        <div style="font-size:0.85rem; color:var(--gold); margin-bottom:0.5rem;">① 1909년, 중국 하얼빈에서 이토 히로부미를 저격한 의사</div>
+        <div class="grid-2" id="q1-grid">
+          <div class="option-card" data-val="안중근" onclick="selOption(this, 'q1')">안중근</div>
+          <div class="option-card" data-val="윤봉길" onclick="selOption(this, 'q1')">윤봉길</div>
+          <div class="option-card" data-val="강우규" onclick="selOption(this, 'q1')">강우규</div>
+          <div class="option-card" data-val="이재명" onclick="selOption(this, 'q1')">이재명</div>
+        </div>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.06); border:1px solid #444; border-radius: 10px; padding: 1rem;">
+        <div style="font-size:0.85rem; color:var(--gold); margin-bottom:0.5rem;">② 1932년, 상하이 훙커우 공원에서 폭탄을 던진 의사</div>
+        <div class="grid-2" id="q2-grid">
+          <div class="option-card" data-val="안중근" onclick="selOption(this, 'q2')">안중근</div>
+          <div class="option-card" data-val="윤봉길" onclick="selOption(this, 'q2')">윤봉길</div>
+          <div class="option-card" data-val="강우규" onclick="selOption(this, 'q2')">강우규</div>
+          <div class="option-card" data-val="이재명" onclick="selOption(this, 'q2')">이재명</div>
+        </div>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.06); border:1px solid #444; border-radius: 10px; padding: 1rem;">
+        <div style="font-size:0.85rem; color:var(--gold); margin-bottom:0.5rem;">③ 1919년, 서울역에서 신임 총독 부임 행렬에 폭탄을 던진 의사</div>
+        <div class="grid-2" id="q3-grid">
+          <div class="option-card" data-val="안중근" onclick="selOption(this, 'q3')">안중근</div>
+          <div class="option-card" data-val="윤봉길" onclick="selOption(this, 'q3')">윤봉길</div>
+          <div class="option-card" data-val="강우규" onclick="selOption(this, 'q3')">강우규</div>
+          <div class="option-card" data-val="이재명" onclick="selOption(this, 'q3')">이재명</div>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn" onclick="checkM7_5()">투사들의 이름을 새기고 이동!</button>
+  </div>
+</div>
+
 <!-- ================= MISSION 8 ================= -->
 <div id="screen-m8" class="screen">
   <div class="content-box">
-    <div class="mission-header">MISSION 8 / 10 : 여옥사</div>
+    <div class="mission-header">MISSION 10 / 12 : 여옥사</div>
     <div class="mission-title">거울 방의 꺾이지 않는 결의</div>
     
     <div class="story-text">
       <div class="horror-text">노역장을 지나 들리는 희미한 노랫소리를 따라 걷는다.</div>
       수많은 여성 독립운동가들이 갇혀 있던 감방.<br>
       비좁고 차가운 바닥에서 그들이 불렀던 '대한이 살았다'의 선율이 들리는 듯하다.<br><br>
-      이곳을 무사히 빠져나가려면 이들의 희생을 기억해야 한다. 조국의 독립을 외치다 18세의 나이로 순국하신 <strong>유관순 열사의 서대문형무소 수형기록표(머그샷) 수감 번호</strong>는 무엇인가?
+      <strong style="color:var(--gold);">1919년 4월 1일, 아우내 장터.</strong><br>
+      열여덟 살의 소녀가 3,000여 군중에게 태극기를 나누어 주며 시위를 이끌었다.<br>
+      붙잡혀 끌려온 그녀는 서대문형무소 11번 감방에서도 독립의 외침을 멈추지 않았다.<br><br>
+      조국의 독립을 외치다 <strong>18세의 나이로 순국하신 유관순 열사의 수감 번호</strong>는 무엇인가?
     </div>
 
     <div class="grid-2" id="m8-grid">
@@ -474,6 +681,7 @@
     <button class="btn" onclick="checkM8()">문을 열고 나아가기</button>
   </div>
 </div>
+
 
 <!-- ================= MISSION 9 ================= -->
 <div id="screen-m9" class="screen">
@@ -493,6 +701,67 @@
     </div>
 
     <button class="btn" onclick="checkM9()">눈물을 닦고 최종 목적지로</button>
+  </div>
+</div>
+
+<!-- ================= PHOTO MISSION (인증샷) ================= -->
+<div id="screen-photo" class="screen">
+  <div class="content-box">
+    <div class="mission-header">SPECIAL MISSION : 생존 증명</div>
+    <div class="mission-title">📸 현장 인증 작전</div>
+
+    <!-- 폼 영역 -->
+    <div id="photo-form-area">
+      <div class="story-text">
+        동지들이 지하 연락망을 통해 긴급 메시지를 보내왔다.<br>
+        <strong style="color: var(--gold);">"살아서 그곳에 섰음을 증명하라!"</strong><br><br>
+        날씨에 맞는 장소를 선택하고, 그 장소에서 찍은 사진을 전송하라.<br>
+        선생님(비밀 본부)의 확인이 끝나면 탈출 최종 단계가 열린다.
+      </div>
+
+      <div class="input-label" style="margin-bottom: 0.8rem;">🗺️ 인증 장소 선택 (하나만 고르세요)</div>
+      <div class="location-choice">
+        <div class="location-card" id="loc-indoor" onclick="selectLocation('indoor')">
+          <span class="loc-emoji">🏛️</span>
+          <div class="loc-name">실내 코스 ☔</div>
+          <div class="loc-desc">비가 오거나 날씨가 안 좋을 때<br><strong style="color:#ddd;">유관순 열사 수감방 앞</strong><br>(여옥사 11번 감방)</div>
+        </div>
+        <div class="location-card" id="loc-outdoor" onclick="selectLocation('outdoor')">
+          <span class="loc-emoji">🌳</span>
+          <div class="loc-name">실외 코스 ☀️</div>
+          <div class="loc-desc">날씨가 좋을 때<br><strong style="color:#ddd;">통곡의 미루나무 앞</strong><br>(사형장 야외)</div>
+        </div>
+      </div>
+
+      <!-- 업로드 영역 (장소 선택 후 표시) -->
+      <div id="photo-upload-section" style="display: none;">
+        <div class="upload-zone" id="upload-zone" onclick="triggerFileInput()">
+          <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="onPhotoSelected(this)">
+          <div id="upload-icon" style="font-size: 2.5rem; margin-bottom: 0.5rem;">📷</div>
+          <div id="upload-text" style="font-weight: bold; color: #ddd; margin-bottom: 0.3rem;">여기를 눌러 사진을 선택하세요</div>
+          <div id="upload-subtext" style="font-size: 0.8rem; color: #888;">지정 장소가 잘 보이도록 찍어주세요</div>
+          <img id="photo-preview" class="upload-preview" alt="미리보기">
+        </div>
+
+        <button class="btn" id="btn-photo-submit" onclick="submitPhoto()">
+          📤 사진 제출 및 승인 요청
+        </button>
+      </div>
+    </div>
+
+    <!-- 승인 대기 화면 -->
+    <div id="photo-waiting-area" style="display: none; text-align: center;">
+      <span class="waiting-icon">📡</span>
+      <div class="mission-title" style="font-size: 1.5rem; margin-bottom: 0.5rem;">비밀 본부 교신 중...</div>
+      <div class="story-text" style="margin-bottom: 1.5rem;">
+        <strong id="waiting-student-name" style="color: var(--gold);"></strong> 요원의 사진이 전송되었습니다.<br>
+        선택 장소: <strong id="waiting-location" style="color: #ddd;"></strong><br><br>
+        선생님(비밀 본부)의 확인을 기다리는 중입니다.<br>
+        <span style="color: #888; font-size: 0.9rem;">잠시 후 자동으로 다음 단계로 이동합니다.</span>
+      </div>
+      <div class="spinner"></div>
+      <div style="font-size: 0.8rem; color: #666; margin-top: 1rem;">📱 화면을 닫지 마세요</div>
+    </div>
   </div>
 </div>
 
@@ -554,20 +823,25 @@
     m7_pass: false,
     m8_pass: false,
     m9_will: '',
+    photo_location: '', photo_approved: false,
+    m1_5_pass: false, m7_5_pass: false,
     m10_career: '', m10_pledge: ''
   };
 
   const BGS = {
     'screen-intro': 'assets/seodaemun_exhibition_notext_1787565698060.jpg',
     'screen-m1': 'assets/seodaemun_exhibition_notext_1787565698060.jpg',
+    'screen-m1_5': 'assets/seodaemun_exhibition_notext_1787565698060.jpg',
     'screen-m2': 'assets/seodaemun_torture_1787565732171.jpg',
     'screen-m3': 'assets/seodaemun_corridor_1787565107829.jpg',
     'screen-m4': 'assets/seodaemun_darkcell_1787565710487.jpg',
     'screen-m5': 'assets/seodaemun_factory_1787565120217.jpg',
     'screen-m6': 'assets/seodaemun_execution_1787565133700.jpg',
     'screen-m7': 'assets/seodaemun_corridor_1787565107829.jpg',
+    'screen-m7_5': 'assets/seodaemun_corridor_1787565107829.jpg',
     'screen-m8': 'assets/seodaemun_women_prison_1787565146588.jpg',
     'screen-m9': 'assets/seodaemun_execution_1787565133700.jpg',
+    'screen-photo': 'assets/seodaemun_execution_1787565133700.jpg',
     'screen-m10': 'assets/seodaemun_memorial_1787565159132.jpg',
     'screen-success': 'assets/seodaemun_memorial_1787565159132.jpg'
   };
@@ -591,14 +865,14 @@
   // 선생님이 만드신 영상 파일의 이름을 정확히 적어주세요.
   // 예: 'assets/인트로.mp4' 와 같이 적어주시면 됩니다.
   const VIDEOS = {
-    'vid_intro': '1. 인트로.mp4', // 오프닝 영상
-    'vid_m1_to_m2': '', // 고문실 넘어갈 때 영상 (빈칸으로 두면 자연스럽게 넘어갑니다)
-    'vid_m3_to_m4': '', // 벽관에서 먹방 넘어갈 때 영상
-    'vid_m9_to_m10': '', // 사형장에서 추모비 넘어갈 때 영상 (빈칸 유지)
-    'vid_ending': '3. 엔딩.mp4' // 엔딩 영상
+    'vid_intro': '1. 인트로.mp4',
+    'vid_m1_to_m2': '',
+    'vid_m3_to_m4': '',
+    'vid_m9_to_m10': '',
+    'vid_ending': '3. 엔딩.mp4'
   };
 
-  function playTransition(vidKey, nextScreenId) {
+  function playTransition(vidKey, nextArg) {
     if(vidKey === 'vid_intro') {
       submission.name = document.getElementById('inp-name').value.trim();
       submission.class = document.getElementById('inp-class').value.trim();
@@ -607,35 +881,21 @@
         return showToast('신분증 정보(이름, 학반, 번호)를 모두 입력해라!', true);
       }
     }
-
     const vidSrc = VIDEOS[vidKey];
+    const goNext = typeof nextArg === 'function' ? nextArg : () => showScreen(nextArg);
     if(vidSrc) {
       const overlay = document.getElementById('video-overlay');
       const vid = document.getElementById('transition-video');
       vid.src = vidSrc;
       overlay.style.display = 'flex';
-      
-      vid.onended = () => {
-        overlay.style.display = 'none';
-        showScreen(nextScreenId);
-      };
-      
-      vid.play().catch(e => {
-        console.warn("비디오 자동재생 실패:", e);
-        overlay.style.display = 'none';
-        showScreen(nextScreenId);
-      });
-
-      window._skipVideo = () => {
-        vid.pause();
-        overlay.style.display = 'none';
-        showScreen(nextScreenId);
-      };
+      vid.onended = () => { overlay.style.display = 'none'; goNext(); };
+      vid.play().catch(e => { console.warn(e); overlay.style.display = 'none'; goNext(); });
+      window._skipVideo = () => { vid.pause(); overlay.style.display = 'none'; goNext(); };
     } else {
-      // 영상이 없으면 바로 다음 화면으로
-      showScreen(nextScreenId);
+      goNext();
     }
   }
+
 
   function skipVideo() {
     if(window._skipVideo) window._skipVideo();
@@ -676,7 +936,21 @@
     if(submission.m1_reason.length < 5) return showToast('순사를 속이려면 이유를 그럴듯하게 적어라!', true);
     gotKey(1);
     showToast('순사를 성공적으로 속였다!');
-    setTimeout(() => playTransition('vid_m1_to_m2', 'screen-m2'), 1000);
+    setTimeout(() => showScreen('screen-m1_5'), 1000);
+  }
+
+  /* M1.5: 을사오적 */
+  function checkM1_5() {
+    const sel = document.querySelector('#m1_5-grid .option-card.selected');
+    if(!sel) return showToast('답을 선택하라!', true);
+    if(sel.dataset.val === '이완용') {
+      submission.m1_5_pass = true;
+      gotKey(11);
+      showToast('이완용! 그 이름을 기억하자. 다음 구역으로!');
+      setTimeout(() => playTransition('vid_m1_to_m2', 'screen-m2'), 1000);
+    } else {
+      showToast('틀렸다! 역사적 사실을 다시 때올려발자!', true);
+    }
   }
 
   /* M2: Torture */
@@ -698,8 +972,8 @@
     if(pwd === '24530819') {
       submission.m3_pass = true;
       gotKey(3);
-      showToast('철컥! 마스터 자물쇠가 풀렸다.');
-      setTimeout(() => playTransition('vid_m3_to_m4', 'screen-m4'), 1000);
+      showToast('철쿥! 마스터 자물쇼가 풀렸다.');
+      setTimeout(() => playTransition('vid_m3_to_m4', () => triggerGuardEvent('screen-m4')), 1000);
     } else {
       showToast('비밀번호가 틀렸다! 기호와 연도를 다시 잘 매칭해보라!', true);
     }
@@ -767,7 +1041,7 @@
          submission.m5_pass = true;
          gotKey(5);
          showToast('완벽하게 순찰을 피해 독방에 도착했습니다!');
-         setTimeout(() => showScreen('screen-m6'), 1000);
+         setTimeout(() => triggerKeyHuntEvent('screen-m6'), 1000);
       } else if (mapPath.length === 23) {
          showToast('모든 안전 구역을 돌았지만 독방이 아닙니다! (초기화하세요)', true);
       } else if (r === 4 && c === 4 && mapPath.length < 23) {
@@ -794,12 +1068,12 @@
 
 
 
+
   /* M6: Gyeokbyeokjang Structure */
   function checkM6() {
     const a1 = document.getElementById('m6-ans1').value.replace(/\s/g, '');
     const a2 = document.getElementById('m6-ans2').value.replace(/\s/g, '');
     const a3 = document.getElementById('m6-ans3').value.replace(/\s/g, '');
-
     if (a1 === '부채꼴' && a2 === '10' && a3 === '중앙감시대') {
       submission.m6_pass = true;
       gotKey(6);
@@ -817,9 +1091,29 @@
       submission.m7_pass = true;
       gotKey(7);
       showToast('순찰 시간표 규칙을 정확히 간파했다!');
-      setTimeout(() => showScreen('screen-m8'), 1000);
+      setTimeout(() => showScreen('screen-m7_5'), 1000);
     } else {
       showToast('틀렸다! 달력의 날짜와 시간을 다시 비교해보라.', true);
+    }
+  }
+
+  /* M7.5: 의열투사 */
+  function checkM7_5() {
+    const q1 = document.querySelector('#q1-grid .option-card.selected');
+    const q2 = document.querySelector('#q2-grid .option-card.selected');
+    const q3 = document.querySelector('#q3-grid .option-card.selected');
+    if(!q1 || !q2 || !q3) return showToast('세 문제 모두 답하라!', true);
+    const a1ok = q1.dataset.val === '안중근';
+    const a2ok = q2.dataset.val === '윤봉길';
+    const a3ok = q3.dataset.val === '강우규';
+    if(a1ok && a2ok && a3ok) {
+      submission.m7_5_pass = true;
+      gotKey(12);
+      showToast('의열 투사들의 이름을 마음에 새겼다!');
+      setTimeout(() => triggerGuardEvent('screen-m8'), 1000);
+    } else {
+      const wrongs = [!a1ok&&'①',!a2ok&&'②',!a3ok&&'③'].filter(Boolean).join(' ');
+      showToast(`${wrongs}번 오답! 의열투사의 의거를 다시 읽어보세요.`, true);
     }
   }
 
@@ -831,19 +1125,227 @@
       submission.m8_pass = true;
       gotKey(8);
       showToast('그녀의 숭고한 희생을 영원히 기억합시다.');
-      setTimeout(() => showScreen('screen-m9'), 1000);
+      setTimeout(() => triggerGuardEvent('screen-m9'), 1000);
     } else {
       showToast('틀렸습니다. 다시 한번 역사적 사실을 떠올려보세요.', true);
     }
   }
-
   /* M9: Execution */
   function checkM9() {
     submission.m9_will = document.getElementById('m9-text').value.trim();
     if(submission.m9_will.length < 5) return showToast('마지막 기록을 진심을 담아 남겨주세요.', true);
     gotKey(9);
-    showToast('눈물을 닦고 마지막 발걸음을 옮깁니다.');
-    setTimeout(() => playTransition('vid_m9_to_m10', 'screen-m10'), 1000);
+    showToast('눈물을 닦고 마지막 발걸음을 옮깁니다...');
+    setTimeout(() => playTransition('vid_m9_to_m10', 'screen-photo'), 1000);
+  }
+
+  /* ===== 긴장 이벤트 함수들 ===== */
+
+  function triggerGuardEvent(nextScreenId) {
+    const overlay = document.getElementById('guard-event-overlay');
+    overlay.style.display = 'flex';
+    // 사운드
+    const sfx = document.getElementById('sfx-footstep');
+    if(sfx) sfx.play().catch(()=>{});
+    const hb = document.getElementById('sfx-heartbeat');
+    if(hb) { hb.volume = 0.3; hb.play().catch(()=>{}); }
+    // 콴텐츠 취소
+    document.getElementById('guard-countdown').style.display = 'block';
+    document.getElementById('guard-survived').style.display = 'none';
+    document.getElementById('guard-title').textContent = '⚠️ 간수 출현!';
+    document.getElementById('guard-subtitle').textContent = '발소리가 들린다... 꼼짝 마!';
+    // 카운트다운
+    let count = 3;
+    document.getElementById('guard-countdown').textContent = count;
+    const timer = setInterval(() => {
+      count--;
+      document.getElementById('guard-countdown').textContent = count;
+      if(count <= 0) {
+        clearInterval(timer);
+        if(sfx) sfx.pause();
+        if(hb) hb.pause();
+        document.getElementById('guard-countdown').style.display = 'none';
+        document.getElementById('guard-subtitle').textContent = '';
+        document.getElementById('guard-title').textContent = '간수가 지나갔다...';
+        document.getElementById('guard-survived').style.display = 'block';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          showScreen(nextScreenId);
+        }, 1500);
+      }
+    }, 1000);
+  }
+
+  function triggerKeyHuntEvent(nextScreenId) {
+    const overlay = document.getElementById('keyhunt-event-overlay');
+    overlay.style.display = 'flex';
+    document.getElementById('keyhunt-result').style.display = 'none';
+    window._keyHuntNext = nextScreenId;
+    initKeyHuntGrid();
+  }
+
+  function initKeyHuntGrid() {
+    const grid = document.getElementById('keyhunt-grid');
+    const icons = ['🧱', '🥣', '🥊', '🦺', '👀', '🦀', '📦', '🥖',
+                   '🔑', '🥞', '🧼', '🔐', '🌏', '🥷', '🧲', '🛒'];
+    // 키를 랜덤 위치에 숨긴다
+    const keyIndex = Math.floor(Math.random() * icons.length);
+    grid.innerHTML = icons.map((icon, i) => `
+      <div class="keyhunt-cell" onclick="clickKeyHuntCell(this, ${i === keyIndex})">${icon}</div>
+    `).join('');
+  }
+
+  function clickKeyHuntCell(el, isKey) {
+    if(isKey) {
+      el.classList.add('found');
+      el.textContent = '🗝️';
+      document.getElementById('keyhunt-result').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('keyhunt-event-overlay').style.display = 'none';
+        showScreen(window._keyHuntNext);
+      }, 1800);
+    } else {
+      el.style.opacity = '0.3';
+      el.style.pointerEvents = 'none';
+      // 없는 곳 클릭 시 그리드 재시작
+      setTimeout(() => initKeyHuntGrid(), 400);
+    }
+  }
+
+  /* PHOTO MISSION */
+  let selectedLocation = null;
+  let photoDocId = null;
+  let photoPollingTimer = null;
+
+  function selectLocation(loc) {
+    selectedLocation = loc;
+    document.querySelectorAll('.location-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('loc-' + loc).classList.add('selected');
+    document.getElementById('photo-upload-section').style.display = 'block';
+    // 업로드 초기화
+    document.getElementById('photo-input').value = '';
+    document.getElementById('photo-preview').classList.remove('show');
+    document.getElementById('upload-zone').classList.remove('has-image');
+    document.getElementById('upload-icon').textContent = '📷';
+    document.getElementById('upload-text').textContent = '여기를 눌러 사진을 선택하세요';
+    document.getElementById('upload-subtext').textContent = selectedLocation === 'indoor'
+      ? '유관순 열사 방이 보이도록 찍어주세요'
+      : '통곡의 미루나무가 보이도록 찍어주세요';
+  }
+
+  function triggerFileInput() {
+    document.getElementById('photo-input').click();
+  }
+
+  function onPhotoSelected(input) {
+    const file = input.files[0];
+    if(!file) return;
+    if(file.size > 5 * 1024 * 1024) {
+      return showToast('사진 크기가 너무 큽니다 (최대 5MB)', true);
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = document.getElementById('photo-preview');
+      preview.src = e.target.result;
+      preview.classList.add('show');
+      document.getElementById('upload-zone').classList.add('has-image');
+      document.getElementById('upload-icon').textContent = '✅';
+      document.getElementById('upload-text').textContent = '사진이 선택되었습니다!';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function submitPhoto() {
+    if(!selectedLocation) return showToast('장소를 먼저 선택하세요!', true);
+    const file = document.getElementById('photo-input').files[0];
+    if(!file) return showToast('사진을 먼저 선택하세요!', true);
+
+    const btn = document.getElementById('btn-photo-submit');
+    btn.textContent = '전송 중... 📡';
+    btn.disabled = true;
+
+    try {
+      // 이미지를 Base64로 변환 (크기 압축)
+      const base64 = await compressImage(file, 800);
+      
+      submission.photo_location = selectedLocation;
+      const locLabel = selectedLocation === 'indoor' ? '실내(유관순 열사 방)' : '실외(통곡의 미루나무)';
+
+      const photoData = {
+        studentName: submission.name,
+        studentClass: submission.class,
+        studentNumber: submission.number,
+        location: selectedLocation,
+        locationLabel: locLabel,
+        photoBase64: base64,
+        approved: false,
+        submittedAt: new Date(),
+        submittedAtLocal: new Date().toLocaleString('ko-KR')
+      };
+
+      if(db) {
+        const docRef = await db.collection('photo_missions').add(photoData);
+        photoDocId = docRef.id;
+      } else {
+        // Firebase 없을 때 LocalStorage fallback (자동 통과)
+        photoDocId = 'local_' + Date.now();
+        showToast('(오프라인 모드) 사진 제출 완료! 자동으로 통과합니다.');
+        setTimeout(() => photoApproved(), 2000);
+        return;
+      }
+
+      // 대기 화면 전환
+      document.getElementById('photo-form-area').style.display = 'none';
+      document.getElementById('photo-waiting-area').style.display = 'block';
+      document.getElementById('waiting-student-name').textContent = submission.name;
+      document.getElementById('waiting-location').textContent = locLabel;
+
+      // 선생님 승인 폴링 시작
+      startApprovalPolling();
+
+    } catch(err) {
+      console.error(err);
+      showToast('전송 중 오류가 발생했습니다. 다시 시도해주세요.', true);
+      btn.textContent = '📤 사진 제출 및 승인 요청';
+      btn.disabled = false;
+    }
+  }
+
+  function compressImage(file, maxWidth) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if(w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = url;
+    });
+  }
+
+  function startApprovalPolling() {
+    if(!db || !photoDocId) return;
+    photoPollingTimer = setInterval(async () => {
+      try {
+        const doc = await db.collection('photo_missions').doc(photoDocId).get();
+        if(doc.exists && doc.data().approved === true) {
+          clearInterval(photoPollingTimer);
+          photoApproved();
+        }
+      } catch(e) { console.warn('polling error', e); }
+    }, 3000); // 3초마다 확인
+  }
+
+  function photoApproved() {
+    clearInterval(photoPollingTimer);
+    submission.photo_approved = true;
+    showToast('📸 선생님이 인증사진을 확인했습니다! 계속 진행하세요!');
+    setTimeout(() => showScreen('screen-m10'), 1500);
   }
 
   /* M10: Memorial */
