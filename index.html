@@ -355,9 +355,6 @@
 <div id="guard-event-overlay" style="display:none; position:fixed; inset:0; z-index:9500; background:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; overflow:hidden;">
   <div class="siren-bg"></div>
   
-  <!-- 간수 출현 연출 영상 -->
-  <video id="guard-shadow" src="간수.mp4" playsinline muted style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); height:80vh; max-width:90vw; object-fit:contain; opacity:0; z-index:20; pointer-events:none; filter: drop-shadow(0 0 50px rgba(255,0,0,0.9));"></video>
-  
   <div id="guard-text-area" style="position:relative; z-index:10; padding: 2.5rem; background:rgba(0,0,0,0.85); border:2px solid #555; border-radius:12px; box-shadow:0 0 50px #000;">
     <div class="event-title" id="guard-title">⚠️ 발소리가 들린다...</div>
     <div class="event-subtitle" id="guard-subtitle" style="margin-bottom:1.5rem; font-size:1.1rem; color:#aaa;">간수가 다가오고 있습니다. 들키지 않게 숨을 참으세요!</div>
@@ -365,9 +362,13 @@
     <div class="event-countdown" id="guard-countdown" style="display:none; font-size:6rem; margin-top:1rem; color:#ff4444; text-shadow:0 0 20px #ff0000;">3</div>
     <div class="event-survived" id="guard-survived" style="display:none; color:#22c55e; margin-top:1rem; font-size:1.5rem; font-weight:bold;">간수가 지나갔다...</div>
   </div>
+
+  <!-- 간수 출현 연출 영상 (텍스트 팝업 위로 무조건 올라오게 z-index 극대화 및 DOM 최하단 배치) -->
+  <video id="guard-shadow" src="간수.mp4" playsinline muted style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); height:80vh; max-width:90vw; object-fit:contain; opacity:0; z-index:9999; pointer-events:none; filter: drop-shadow(0 0 50px rgba(255,0,0,0.9));"></video>
+  
   <audio id="sfx-footstep" src="https://assets.mixkit.co/active_storage/sfx/107/107-preview.mp3" preload="auto"></audio>
   <audio id="sfx-heartbeat" src="https://assets.mixkit.co/active_storage/sfx/228/228-preview.mp3" preload="auto"></audio>
-  <audio id="sfx-spooky" src="https://assets.mixkit.co/active_storage/sfx/2659/2659-preview.mp3" preload="auto"></audio>
+  <audio id="sfx-spooky" src="https://assets.mixkit.co/active_storage/sfx/2404/2404-preview.mp3" preload="auto"></audio>
 </div>
 
 <!-- ===== 열쇠 탐색 이벤트 오버레이 ===== -->
