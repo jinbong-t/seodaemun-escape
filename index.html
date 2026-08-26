@@ -363,12 +363,11 @@
     <div class="event-survived" id="guard-survived" style="display:none; color:#22c55e; margin-top:1rem; font-size:1.5rem; font-weight:bold;">간수가 지나갔다...</div>
   </div>
 
-  <!-- 간수 출현 연출 영상 (텍스트 팝업 위로 무조건 올라오게 z-index 극대화 및 DOM 최하단 배치) -->
-  <video id="guard-shadow" src="간수.mp4" playsinline muted style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); height:80vh; max-width:90vw; object-fit:contain; opacity:0; z-index:9999; pointer-events:none; filter: drop-shadow(0 0 50px rgba(255,0,0,0.9));"></video>
+  <!-- 간수 출현 연출 영상 (텍스트 팝업 위쪽인 화면 상단에 배치, 가리지 않도록 z-index 5로 원상복구) -->
+  <video id="guard-shadow" src="간수.mp4" playsinline muted style="position:absolute; top:25%; left:50%; transform:translate(-50%, -50%); height:40vh; max-width:90vw; object-fit:contain; opacity:0; z-index:5; pointer-events:none; filter: drop-shadow(0 0 50px rgba(255,0,0,0.9));"></video>
   
   <audio id="sfx-footstep" src="https://assets.mixkit.co/active_storage/sfx/107/107-preview.mp3" preload="auto"></audio>
   <audio id="sfx-heartbeat" src="https://assets.mixkit.co/active_storage/sfx/228/228-preview.mp3" preload="auto"></audio>
-  <audio id="sfx-spooky" src="https://assets.mixkit.co/active_storage/sfx/2404/2404-preview.mp3" preload="auto"></audio>
 </div>
 
 <!-- ===== 열쇠 탐색 이벤트 오버레이 ===== -->
@@ -1318,7 +1317,7 @@
     shadow.play().catch(()=>{});
     shadow.style.transition = 'none';
     shadow.style.opacity = '0';
-    shadow.style.transform = 'translate(-50%, -40%) scale(0.8)';
+    shadow.style.transform = 'translate(-50%, -20%) scale(0.8)';
     shadow.style.animation = 'none';
     setTimeout(() => {
       shadow.style.transition = 'all 3s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -1329,11 +1328,9 @@
     // 이 타이밍에 사운드를 재생해야 모바일에서도 막히지 않음
     const sfx = document.getElementById('sfx-footstep');
     const hb = document.getElementById('sfx-heartbeat');
-    const spooky = document.getElementById('sfx-spooky');
     
     if(sfx) { sfx.currentTime = 0; sfx.play().catch(()=>{}); }
     if(hb) { hb.currentTime = 0; hb.play().catch(()=>{}); }
-    if(spooky) { spooky.currentTime = 0; spooky.play().catch(()=>{}); }
     
     // 카운트다운 3초
     let count = 3;
@@ -1345,7 +1342,6 @@
         clearInterval(timer);
         if(sfx) sfx.pause();
         if(hb) hb.pause();
-        if(spooky) spooky.pause();
         if(shadow && shadow.pause) shadow.pause();
         document.getElementById('guard-countdown').style.display = 'none';
         document.getElementById('guard-subtitle').textContent = '';
