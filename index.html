@@ -851,9 +851,9 @@
     </div>
     
     <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--gold); padding: 1.5rem; border-radius: 8px; margin: 2rem 0;">
-      <div style="color:var(--gold); font-family: var(--font-serif); font-size: 0.8rem; letter-spacing: 2px;">독 립 유 공 자 증 서</div>
+      <div style="color:var(--gold); font-family: var(--font-serif); font-size: 0.85rem; letter-spacing: 2px;">명 예 독 립 운 동 가 임 명 장</div>
       <div style="font-size: 1.5rem; font-weight: bold; margin: 1rem 0;" id="cert-name">요원 이름</div>
-      <div style="color: #aaa; font-size: 0.9rem;">위 사람은 서대문 탈출 작전의 모진 시련을 극복하고 조국 독립에 기여하였음.</div>
+      <div style="color: #aaa; font-size: 0.9rem;">위 사람은 서대문 탈출 작전의 모진 시련을 극복하고, 독립운동가의 숭고한 얼을 이어받았기에 이 증서를 수여함.</div>
     </div>
 
     <div style="font-size: 0.8rem; color: #777;">화면을 캡처하여 간직하세요.</div>
@@ -1451,8 +1451,8 @@
   function photoApproved() {
     clearInterval(photoPollingTimer);
     submission.photo_approved = true;
-    showToast('📸 선생님이 인증사진을 확인했습니다! 계속 진행하세요!');
-    setTimeout(() => showScreen('screen-m10'), 1500);
+    showToast('📸 선생님이 인증사진을 확인했습니다! 마지막 임무로 이동합니다.');
+    setTimeout(() => playTransition('vid_ending', 'screen-m10'), 1500);
   }
 
   /* M10: Memorial */
@@ -1484,7 +1484,7 @@
       gotKey(10);
       document.getElementById('cert-name').textContent = submission.name + ' 요원';
       document.getElementById('progress-bar').style.display = 'none';
-      playTransition('vid_ending', 'screen-success');
+      showScreen('screen-success');
 
     } catch(err) {
       console.error(err);
