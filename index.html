@@ -355,8 +355,8 @@
 <div id="guard-event-overlay" style="display:none; position:fixed; inset:0; z-index:9500; background:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; overflow:hidden;">
   <div class="siren-bg"></div>
   
-  <!-- 간수 출현 연출 -->
-  <img id="guard-shadow" src="assets/japanese_guard_1919.jpg" alt="간수" style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); height:85vh; max-width:100%; object-fit:contain; opacity:0; z-index:5; pointer-events:none; filter: drop-shadow(0 0 30px rgba(255,0,0,0.5));">
+  <!-- 간수 출현 연출 영상 -->
+  <video id="guard-shadow" src="간수.mp4" playsinline muted style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); height:80vh; max-width:90vw; object-fit:contain; opacity:0; z-index:5; pointer-events:none; filter: drop-shadow(0 0 50px rgba(255,0,0,0.9));"></video>
   
   <div id="guard-text-area" style="position:relative; z-index:10; padding: 2.5rem; background:rgba(0,0,0,0.85); border:2px solid #555; border-radius:12px; box-shadow:0 0 50px #000;">
     <div class="event-title" id="guard-title">⚠️ 발소리가 들린다...</div>
@@ -1308,17 +1308,18 @@
     document.getElementById('guard-subtitle').textContent = '절대 움직이지 마세요!';
     document.getElementById('guard-countdown').style.display = 'block';
     
-    // 무서운 간수가 어둠 속에서 나타나는 연출
+    // 간수 영상 재생 연출 (가운데서 긴장감 있게 줌인)
     const shadow = document.getElementById('guard-shadow');
+    shadow.currentTime = 0;
+    shadow.play().catch(()=>{});
     shadow.style.transition = 'none';
     shadow.style.opacity = '0';
-    shadow.style.transform = 'translate(-50%, 10%) scale(0.9)';
+    shadow.style.transform = 'translate(-50%, -40%) scale(0.8)';
     shadow.style.animation = 'none';
     setTimeout(() => {
-      shadow.style.transition = 'all 3s ease-out';
-      shadow.style.opacity = '0.9';
-      shadow.style.transform = 'translate(-50%, 0) scale(1)';
-      shadow.style.animation = 'walkBob 1.5s infinite ease-in-out';
+      shadow.style.transition = 'all 3s cubic-bezier(0.25, 1, 0.5, 1)';
+      shadow.style.opacity = '1';
+      shadow.style.transform = 'translate(-50%, -50%) scale(1.05)';
     }, 50);
     
     // 이 타이밍에 사운드를 재생해야 모바일에서도 막히지 않음
@@ -1337,6 +1338,7 @@
         clearInterval(timer);
         if(sfx) sfx.pause();
         if(hb) hb.pause();
+        if(shadow && shadow.pause) shadow.pause();
         document.getElementById('guard-countdown').style.display = 'none';
         document.getElementById('guard-subtitle').textContent = '';
         document.getElementById('guard-title').textContent = '간수가 지나갔다...';
