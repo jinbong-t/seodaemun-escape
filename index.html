@@ -1149,7 +1149,7 @@
         } else if(r===5 && c===5) {
           cell.classList.add('target');
           cell.innerHTML = 'X';
-        } else if((r===1 && c===2) || (r===2 && c===4) || (r===4 && c===1) || (r===3 && c===3) || (r===0 && c===5)) {
+        } else if((r===0 && c===4) || (r===3 && c===1) || (r===0 && c===5) || (r===4 && c===5) || (r===2 && c===1)) {
           cell.classList.add('guard');
           cell.innerHTML = '간수';
         }
@@ -1160,7 +1160,7 @@
   }
 
   function clickCell(r, c) {
-    if((r===1 && c===2) || (r===2 && c===4) || (r===4 && c===1) || (r===3 && c===3) || (r===0 && c===5)) {
+    if((r===0 && c===4) || (r===3 && c===1) || (r===0 && c===5) || (r===4 && c===5) || (r===2 && c===1)) {
       showToast('간수에게 들켰다! 경로 초기화!', true);
       resetMap();
       return;
@@ -1208,7 +1208,7 @@
         const cell = document.getElementById(`cell-${r}-${c}`);
         if(r===0 && c===0) cell.className = 'map-cell visited';
         else if(r===5 && c===5) cell.className = 'map-cell target';
-        else if((r===1 && c===2) || (r===2 && c===4) || (r===4 && c===1) || (r===3 && c===3) || (r===0 && c===5)) cell.className = 'map-cell guard';
+        else if((r===0 && c===4) || (r===3 && c===1) || (r===0 && c===5) || (r===4 && c===5) || (r===2 && c===1)) cell.className = 'map-cell guard';
         else cell.className = 'map-cell';
       }
     }
