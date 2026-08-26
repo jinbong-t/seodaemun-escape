@@ -557,6 +557,7 @@
     </div>
 
     <div class="horror-text">
+      <button class="btn" style="background:#444; color:#fff; border:1px solid #777; padding: 0.5rem 1rem; font-size:1rem; margin-bottom:1rem;" onclick="playKnockSequence()">👂 벽 너머 소리 듣기 (클릭)</button><br>
       (쿵쿵쿵쿵쿵쿵쿵쿵) ... (쿵) ... (쿵쿵쿵쿵쿵)
     </div>
 
@@ -862,6 +863,11 @@
 
 <div id="toast">메시지</div>
 
+<audio id="sfx-success" src="https://s3.amazonaws.com/freecodecamp/drums/Chord_1.mp3" preload="auto"></audio>
+<audio id="sfx-error" src="https://s3.amazonaws.com/freecodecamp/drums/RP4_KICK_1.mp3" preload="auto"></audio>
+<audio id="sfx-click" src="https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3" preload="auto"></audio>
+<audio id="sfx-knock" src="https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3" preload="auto"></audio>
+
 <script src="firebase-config.js"></script>
 <script>
   let db = null;
@@ -906,12 +912,31 @@
     }
   } catch(e){ console.warn("Firebase not initialized"); }
 
+  function playSfx(id, volume = 0.5) {
+    const el = document.getElementById(id);
+    if(el) {
+      el.volume = volume;
+      el.currentTime = 0;
+      el.play().catch(()=>{});
+    }
+  }
+
+  // 전역 클릭 효과음 연동
+  document.addEventListener('click', (e) => {
+    if(e.target.closest('button') || e.target.closest('.option-card')) {
+      playSfx('sfx-click', 0.2);
+    }
+  });
+
   function showToast(msg, isError = false, duration = 3000) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.style.background = isError ? 'var(--red)' : 'var(--gold)';
     t.classList.add('show');
-    if(isError) triggerAlert();
+    if(isError) {
+      triggerAlert();
+      playSfx('sfx-error', 0.6);
+    }
     setTimeout(() => t.classList.remove('show'), duration);
   }
 
@@ -972,6 +997,7 @@
   }
 
   function gotKey(num) {
+    playSfx('sfx-success', 0.4);
     document.getElementById('progress-bar').style.display = 'block';
     document.getElementById(`k${num}`).classList.add('got');
   }
@@ -1040,6 +1066,26 @@
   }
 
   /* M4: Dark Cell Knocking */
+  let isKnocking = false;
+  async function playKnockSequence() {
+    if(isKnocking) return;
+    isKnocking = true;
+    
+    const knock = () => new Promise(r => { playSfx('sfx-knock', 0.9); setTimeout(r, 300); });
+    const pause = (ms) => new Promise(r => setTimeout(r, ms));
+    
+    // 8번
+    for(let i=0; i<8; i++) await knock();
+    await pause(800);
+    // 1번
+    await knock();
+    await pause(800);
+    // 5번
+    for(let i=0; i<5; i++) await knock();
+    
+    isKnocking = false;
+  }
+
   function checkM4() {
     const ans = document.getElementById('m4-ans').value.trim();
     if(ans === '815') {
