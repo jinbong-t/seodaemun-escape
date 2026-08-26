@@ -201,6 +201,13 @@
     /* 사이렌 번쩍 배경 및 간수 연출 */
     @keyframes pulse-vignette { from { box-shadow: inset 0 0 80px 20px rgba(0,0,0,0.9); } to { box-shadow: inset 0 0 200px 80px rgba(180,0,0,0.95); } }
     .siren-bg { position: absolute; inset: 0; pointer-events: none; animation: pulse-vignette 1s infinite alternate; }
+    
+    @keyframes walkBob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-25px) rotate(2deg); }
+      50% { transform: translateY(0) rotate(0deg); }
+      75% { transform: translateY(-25px) rotate(-2deg); }
+    }
     /* 카운트다운 */
     @keyframes countPop { 0%{transform:scale(2);opacity:0;} 60%{transform:scale(1.1);opacity:1;} 100%{transform:scale(1);opacity:1;} }
     .event-countdown {
@@ -1229,9 +1236,11 @@
     shadow.style.transition = 'none';
     shadow.style.left = '-100%';
     shadow.style.opacity = '0.75';
+    shadow.style.animation = 'none';
     setTimeout(() => {
       shadow.style.transition = 'left 3s linear';
       shadow.style.left = '100%';
+      shadow.style.animation = 'walkBob 0.8s infinite linear';
     }, 50);
     
     // 이 타이밍에 사운드를 재생해야 모바일에서도 막히지 않음
