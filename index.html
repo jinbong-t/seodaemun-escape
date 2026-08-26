@@ -372,13 +372,12 @@
 
 <!-- 발각 연출 오버레이 -->
 <div id="caught-overlay" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(150,0,0,0.95); flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 2rem;">
-  <div style="font-size: 5rem; margin-bottom: 1rem;">🚨</div>
+  <div style="font-size: 5rem; margin-bottom: 1rem; animation: shake 0.5s infinite;">🚨</div>
   <div style="font-size: 2.5rem; font-weight: bold; color: #fff; margin-bottom: 1.5rem; text-shadow: 0 0 20px #000;">정체 발각!</div>
   <div style="font-size: 1.2rem; color: #ddd; max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">
     형무소 내부를 조사하던 중, 눈치 빠른 일본 순사에게 위장 잠입 사실을 들키고 말았다!<br><br>
     당신은 양팔을 붙잡힌 채 어둡고 차가운 <strong>지하 취조실</strong>로 강제로 끌려가게 되는데...
   </div>
-  <button class="btn" style="background: #000; border: 1px solid #fff;" onclick="document.getElementById('caught-overlay').style.display='none'; playTransition('vid_m1_to_m2', 'screen-m2');">끌려가기</button>
 </div>
 
 <!-- ===== 열쇠 탐색 이벤트 오버레이 ===== -->
@@ -1078,6 +1077,11 @@
       showToast('이완용! 그 이름을 기억하자. 다음 구역으로!');
       setTimeout(() => {
         document.getElementById('caught-overlay').style.display = 'flex';
+        // 4초 뒤 강제로 끌려가는 연출
+        setTimeout(() => {
+          document.getElementById('caught-overlay').style.display = 'none';
+          playTransition('vid_m1_to_m2', 'screen-m2');
+        }, 4000);
       }, 2500); // 얼굴 볼 시간 2.5초 주기
     } else {
       showToast('틀렸다! 역사적 사실을 다시 떠올려보자!', true);
