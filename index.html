@@ -68,9 +68,9 @@
     .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
     
     .content-box {
-      background: var(--bg-dim); border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(10, 10, 10, 0.4); border: 1px solid rgba(255,255,255,0.15);
       border-radius: 12px; padding: 2.5rem; max-width: 550px; width: 100%;
-      backdrop-filter: blur(8px); box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+      backdrop-filter: blur(4px); box-shadow: 0 15px 40px rgba(0,0,0,0.9);
       animation: fadeIn 0.6s ease-out;
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -315,9 +315,13 @@
 </div>
 
 <!-- ===== 간수 출현 이벤트 오버레이 ===== -->
-<div id="guard-event-overlay" style="display:none; position:fixed; inset:0; z-index:9500; background:none; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+<div id="guard-event-overlay" style="display:none; position:fixed; inset:0; z-index:9500; background:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; overflow:hidden;">
   <div class="siren-bg"></div>
-  <div id="guard-text-area" style="position:relative; z-index:10; padding: 2.5rem; background:rgba(0,0,0,0.9); border:2px solid #555; border-radius:12px; box-shadow:0 0 50px #000;">
+  
+  <!-- 지나가는 간수 그림자 연출 -->
+  <img id="guard-shadow" src="assets/guard_silhouette.jpg" alt="간수 그림자" style="position:absolute; bottom:0; left:-100%; height:90vh; opacity:0; filter:brightness(0) drop-shadow(0 0 20px #000); z-index:5; pointer-events:none;">
+  
+  <div id="guard-text-area" style="position:relative; z-index:10; padding: 2.5rem; background:rgba(0,0,0,0.85); border:2px solid #555; border-radius:12px; box-shadow:0 0 50px #000;">
     <div class="event-title" id="guard-title">⚠️ 발소리가 들린다...</div>
     <div class="event-subtitle" id="guard-subtitle" style="margin-bottom:1.5rem; font-size:1.1rem; color:#aaa;">간수가 다가오고 있습니다. 들키지 않게 숨을 참으세요!</div>
     <button id="guard-hold-breath-btn" class="btn" style="background:#800000; color:#fff;" onclick="startGuardHoldBreath()">🤫 숨 참기 (클릭)</button>
@@ -699,7 +703,7 @@
 
 <!-- ================= MISSION 8 ================= -->
 <div id="screen-m8" class="screen">
-  <div class="content-box" style="background: rgba(10,10,10,0.45); backdrop-filter: blur(2px); border: 2px solid rgba(200,200,200,0.1); box-shadow: 0 0 40px rgba(0,0,0,1);">
+  <div class="content-box">
     <div class="mission-header">MISSION 10 / 12 : 여옥사</div>
     <div class="mission-title">거울 방의 꺾이지 않는 결의</div>
     
@@ -1219,6 +1223,16 @@
     document.getElementById('guard-title').textContent = '숨을 참는 중...';
     document.getElementById('guard-subtitle').textContent = '절대 움직이지 마세요!';
     document.getElementById('guard-countdown').style.display = 'block';
+    
+    // 간수 그림자 스르륵 지나가는 애니메이션 시작
+    const shadow = document.getElementById('guard-shadow');
+    shadow.style.transition = 'none';
+    shadow.style.left = '-100%';
+    shadow.style.opacity = '0.75';
+    setTimeout(() => {
+      shadow.style.transition = 'left 3s linear';
+      shadow.style.left = '100%';
+    }, 50);
     
     // 이 타이밍에 사운드를 재생해야 모바일에서도 막히지 않음
     const sfx = document.getElementById('sfx-footstep');
