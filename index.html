@@ -252,9 +252,9 @@
 
     /* Map Puzzle */
     .map-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; 
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; 
       background: #222; border: 2px solid #555; padding: 4px; 
-      max-width: 320px; width: 100%; margin: 0 auto 1.5rem; border-radius: 8px;
+      max-width: 380px; width: 100%; margin: 0 auto 1.5rem; border-radius: 8px;
     }
     .map-cell {
       aspect-ratio: 1; background: #111; border: 1px solid #333; border-radius: 4px;
@@ -333,7 +333,7 @@
 <!-- Video Overlay -->
 <div id="video-overlay" style="display:none; position:fixed; inset:0; z-index:10000; background:black; align-items:center; justify-content:center;">
   <video id="transition-video" style="width:100%; height:100%; object-fit:cover;" playsinline></video>
-  <button onclick="skipVideo()" style="position:absolute; bottom:30px; right:30px; z-index:10001; background:rgba(255,255,255,0.2); border:1px solid #fff; color:#fff; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">건너뛰기 ⏩</button>
+  <button onclick="skipVideo()" style="position:absolute; bottom:15px; right:15px; z-index:10001; background:transparent; border:none; color:rgba(255,255,255,0.15); padding:10px; font-size:0.8rem; cursor:pointer;">건너뛰기 ⏩</button>
 </div>
 
 <div id="progress-bar">
@@ -365,8 +365,8 @@
     <div class="event-countdown" id="guard-countdown" style="display:none; font-size:6rem; margin-top:1rem; color:#ff4444; text-shadow:0 0 20px #ff0000;">3</div>
     <div class="event-survived" id="guard-survived" style="display:none; color:#22c55e; margin-top:1rem; font-size:1.5rem; font-weight:bold;">간수가 지나갔다...</div>
   </div>
-  <audio id="sfx-footstep" src="https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3" preload="auto"></audio>
-  <audio id="sfx-heartbeat" src="https://s3.amazonaws.com/freecodecamp/drums/punchy_kick_1.mp3" preload="auto"></audio>
+  <audio id="sfx-footstep" src="https://assets.mixkit.co/active_storage/sfx/107/107-preview.mp3" preload="auto"></audio>
+  <audio id="sfx-heartbeat" src="https://assets.mixkit.co/active_storage/sfx/228/228-preview.mp3" preload="auto"></audio>
 </div>
 
 <!-- ===== 열쇠 탐색 이벤트 오버레이 ===== -->
@@ -411,7 +411,7 @@
 </div>
 
 <!-- 웅장한 사운드 이펙트 (무료 효과음 URL 또는 로컬 파일) -->
-<audio id="sfx-start" src="https://assets.mixkit.co/active_storage/sfx/204/204-preview.mp3" preload="auto"></audio>
+<audio id="sfx-start" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
 
 <script>
   function startOperation() {
@@ -820,7 +820,7 @@
       <!-- 업로드 영역 (장소 선택 후 표시) -->
       <div id="photo-upload-section" style="display: none;">
         <div class="upload-zone" id="upload-zone" onclick="triggerFileInput()">
-          <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="onPhotoSelected(this)">
+          <input type="file" id="photo-input" accept="image/*" onchange="onPhotoSelected(this)">
           <div id="upload-icon" style="font-size: 2.5rem; margin-bottom: 0.5rem;">📷</div>
           <div id="upload-text" style="font-weight: bold; color: #ddd; margin-bottom: 0.3rem;">여기를 눌러 사진을 선택하세요</div>
           <div id="upload-subtext" style="font-size: 0.8rem; color: #888;">지정 장소가 잘 보이도록 찍어주세요</div>
@@ -893,10 +893,10 @@
 
 <div id="toast">메시지</div>
 
-<audio id="sfx-success" src="https://s3.amazonaws.com/freecodecamp/drums/Chord_1.mp3" preload="auto"></audio>
-<audio id="sfx-error" src="https://s3.amazonaws.com/freecodecamp/drums/RP4_KICK_1.mp3" preload="auto"></audio>
-<audio id="sfx-click" src="https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3" preload="auto"></audio>
-<audio id="sfx-knock" src="https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3" preload="auto"></audio>
+<audio id="sfx-success" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
+<audio id="sfx-error" src="https://assets.mixkit.co/active_storage/sfx/2802/2802-preview.mp3" preload="auto"></audio>
+<audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
+<audio id="sfx-knock" src="https://assets.mixkit.co/active_storage/sfx/2835/2835-preview.mp3" preload="auto"></audio>
 
 <script src="firebase-config.js"></script>
 <script>
@@ -1135,18 +1135,18 @@
     const container = document.getElementById('m5-map');
     if(!container) return;
     container.innerHTML = '';
-    for(let r=0; r<5; r++) {
-      for(let c=0; c<5; c++) {
+    for(let r=0; r<6; r++) {
+      for(let c=0; c<6; c++) {
         const cell = document.createElement('div');
         cell.id = `cell-${r}-${c}`;
         cell.className = 'map-cell';
         if(r===0 && c===0) {
           cell.classList.add('visited');
           cell.innerHTML = '입구';
-        } else if(r===4 && c===4) {
+        } else if(r===5 && c===5) {
           cell.classList.add('target');
           cell.innerHTML = 'X';
-        } else if((r===1 && c===2) || (r===2 && c===2)) {
+        } else if((r===1 && c===2) || (r===2 && c===4) || (r===4 && c===1) || (r===3 && c===3) || (r===0 && c===5)) {
           cell.classList.add('guard');
           cell.innerHTML = '간수';
         }
@@ -1157,7 +1157,7 @@
   }
 
   function clickCell(r, c) {
-    if((r===1 && c===2) || (r===2 && c===2)) {
+    if((r===1 && c===2) || (r===2 && c===4) || (r===4 && c===1) || (r===3 && c===3) || (r===0 && c===5)) {
       showToast('간수에게 들켰다! 경로 초기화!', true);
       resetMap();
       return;
@@ -1184,14 +1184,15 @@
       const cell = document.getElementById(`cell-${r}-${c}`);
       cell.classList.add('visited');
       
-      if(mapPath.length === 23 && r === 4 && c === 4) {
+      // 6x6 전체 36칸 중 간수 5칸을 제외하면 31칸을 밟아야 함
+      if(mapPath.length === 31 && r === 5 && c === 5) {
          submission.m5_pass = true;
          gotKey(5);
          showToast('완벽하게 순찰을 피해 독방에 도착했습니다!');
          setTimeout(() => triggerKeyHuntEvent('screen-m6'), 1000);
-      } else if (mapPath.length === 23) {
+      } else if (mapPath.length === 31) {
          showToast('모든 안전 구역을 돌았지만 독방이 아닙니다! (초기화하세요)', true);
-      } else if (r === 4 && c === 4 && mapPath.length < 23) {
+      } else if (r === 5 && c === 5 && mapPath.length < 31) {
          showToast('경로가 잘못되었습니다! 모든 안전 구역을 한 번씩 지나야 합니다.', true);
       }
     }
@@ -1199,12 +1200,12 @@
 
   function resetMap() {
     mapPath = [[0,0]];
-    for(let r=0; r<5; r++) {
-      for(let c=0; c<5; c++) {
+    for(let r=0; r<6; r++) {
+      for(let c=0; c<6; c++) {
         const cell = document.getElementById(`cell-${r}-${c}`);
         if(r===0 && c===0) cell.className = 'map-cell visited';
-        else if(r===4 && c===4) cell.className = 'map-cell target';
-        else if((r===1 && c===2) || (r===2 && c===2)) cell.className = 'map-cell guard';
+        else if(r===5 && c===5) cell.className = 'map-cell target';
+        else if((r===1 && c===2) || (r===2 && c===4) || (r===4 && c===1) || (r===3 && c===3) || (r===0 && c===5)) cell.className = 'map-cell guard';
         else cell.className = 'map-cell';
       }
     }
