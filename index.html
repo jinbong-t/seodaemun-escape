@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -388,7 +388,7 @@
     <div class="keyhunt-desc" style="margin:0; font-size:0.9rem;">노역장 배경 속 어딘가에 열쇠가 숨겨져 있습니다.<br>배경 속에 자연스럽게 숨겨진 열쇠를 찾아 터치하세요!</div>
   </div>
   
-  <div id="hidden-key-item" onclick="clickKeyHuntCell(true)" style="position:absolute; bottom: 15%; left: 35%; width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; font-size:2rem; filter:brightness(0.15) sepia(1) saturate(1.2) hue-rotate(350deg) drop-shadow(1px 1px 1px rgba(0,0,0,0.9)); cursor:pointer; opacity:0.5; z-index:3; transform: rotate(-20deg);">
+  <div id="hidden-key-item" onclick="clickKeyHuntCell(true)" style="position:absolute; bottom: 6%; left: 60%; width: 50px; height: 50px; display:flex; align-items:center; justify-content:center; font-size:2.2rem; filter: sepia(0.6) brightness(0.6) contrast(1.2) drop-shadow(1px 1px 2px rgba(0,0,0,0.8)); cursor:pointer; opacity:0.85; z-index:10; transform: rotate(15deg);">
     🗝️
   </div>
 
@@ -619,9 +619,14 @@
     
     <div class="story-text">
       가혹한 강제 노역을 하던 공작사.<br>
-      옆에서 일하던 동지가 몰래 피 묻은 지도를 손에 쥐여준다.<br><br>
-      <strong>[동지의 다급한 속삭임]</strong><br>
-      "지하 독방(X)에 김 동지가 갇혀 끔찍한 고문을 당하고 있소! 중간에 <strong>순찰 중인 간수(빨간색)</strong>를 피해, <strong>나머지 모든 안전 구역을 단 한 번씩만 지나서</strong> 도착해야만 들키지 않고 갈 수 있소!"
+      옆에서 일하던 동지가 몰래 피 묻은 지도와 쪽지를 손에 쥐여준다.<br><br>
+      <div style="background: rgba(255,255,255,0.1); padding: 15px; border-left: 3px solid var(--gold); font-size:0.95rem; margin-bottom:1rem; line-height: 1.6;">
+        <strong>[피 묻은 쪽지]</strong><br>
+        "지하 독방(X)에 김 동지가 갇혀 끔찍한 고문을 당하고 있다.<br>
+        중간에 <strong>순찰 중인 간수(빨간색)</strong>를 반드시 피해라!<br>
+        의심을 사지 않으려면 <strong>나머지 모든 빈 구역을 빠짐없이 단 한 번씩만 지나서</strong> 독방에 도달해야 한다.<br><br>
+        부디 들키지 않고 무사히 통과하여 김 동지를 구출해 다오..."
+      </div>
     </div>
 
     <div id="m5-map" class="map-grid"></div>
@@ -885,7 +890,9 @@
 <!-- ================= SUCCESS ================= -->
 <div id="screen-success" class="screen">
   <div class="content-box" style="text-align: center; border-color: var(--gold); box-shadow: 0 0 50px rgba(201,162,39,0.4);">
-    <div style="font-size: 5rem; margin-bottom: 1rem; text-shadow: 0 0 30px var(--gold);">🏅</div>
+    <div style="margin-bottom: 1rem;">
+      <img src="assets/handprint.jpg" alt="대한독립 혈서 손도장" style="width: 120px; border-radius: 8px; filter: drop-shadow(0 0 20px rgba(160,16,16,0.8)); mix-blend-mode: screen;">
+    </div>
     <div class="mission-title" style="color: var(--gold); font-size: 2.5rem; margin-bottom: 0.5rem;">작전 성공!</div>
     <div class="story-text">
       수많은 고통과 아픔을 이겨내고 무사히 탈출했습니다.<br>
@@ -1292,7 +1299,7 @@
       submission.m8_pass = true;
       gotKey(10);
       showToast('그녀의 숭고한 희생을 영원히 기억합시다.');
-      setTimeout(() => triggerGuardEvent('screen-m9'), 1000);
+      setTimeout(() => showScreen('screen-m9'), 1000);
     } else {
       showToast('틀렸습니다. 다시 한번 역사적 사실을 떠올려보세요.', true);
     }
@@ -1377,15 +1384,8 @@
     overlay.style.display = 'block';
     document.getElementById('keyhunt-result').style.display = 'none';
     
-    // 열쇠가 놓일 자연스러운 위치들 (테이블 위, 구석 바닥 등)
-    const positions = [
-      { bottom: '26%', left: '20%', right: 'auto' },  // 가운데 왼쪽 테이블
-      { bottom: '15%', left: '35%', right: 'auto' },  // 가운데 오른쪽 테이블
-      { bottom: '10%', right: '15%', left: 'auto' },  // 오른쪽 구석 바닥
-      { bottom: '6%', left: '60%', right: 'auto' },   // 중앙 나무판자 바닥
-      { bottom: '20%', left: '8%', right: 'auto' }    // 가장 왼쪽 테이블
-    ];
-    const pos = positions[Math.floor(Math.random() * positions.length)];
+    // 선생님 요청으로 열쇠 위치를 바닥에 고정 (중앙 나무판자 바닥)
+    const pos = { bottom: '6%', left: '60%', right: 'auto' };
     
     const keyItem = document.getElementById('hidden-key-item');
     keyItem.style.opacity = '0.85';
@@ -1393,7 +1393,7 @@
     keyItem.style.bottom = pos.bottom;
     keyItem.style.left = pos.left;
     keyItem.style.right = pos.right;
-    keyItem.style.transform = `rotate(${Math.floor(Math.random() * 60) - 30}deg)`;
+    keyItem.style.transform = `rotate(15deg)`;
     
     window._keyHuntNext = nextScreenId;
   }

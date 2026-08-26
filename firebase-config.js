@@ -13,18 +13,14 @@
 // ============================================================
 
 const firebaseConfig = {
-  apiKey:            "여기에-API-키-입력",
-  authDomain:        "여기에-프로젝트ID.firebaseapp.com",
-  projectId:         "여기에-프로젝트ID",
-  storageBucket:     "여기에-프로젝트ID.appspot.com",
-  messagingSenderId: "여기에-메시지발신자ID",
-  appId:             "여기에-앱ID"
+  apiKey: "AIzaSyDtDGuNKlcLEvzMCj2jCWA-9W1zoFzkRzU",
+  authDomain: "seodaemun-escape.firebaseapp.com",
+  projectId: "seodaemun-escape",
+  storageBucket: "seodaemun-escape.firebasestorage.app",
+  messagingSenderId: "996754565811",
+  appId: "1:996754565811:web:9d4f9e08fe303bc3c51ec6",
+  measurementId: "G-Q65JBQJBMS"
 };
-
-// ============================================================
-//  🔑 교사용 관리자 비밀번호 (admin.html 접속 시 사용)
-// ============================================================
-const ADMIN_PASSWORD = "teacher2025";  // ← 원하는 비밀번호로 바꾸세요!
 
 // ============================================================
 //  ℹ️  Firebase 미설정 시 자동으로 localStorage 모드로 작동합니다.
