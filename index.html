@@ -198,17 +198,9 @@
       background: #000; flex-direction: column;
       align-items: center; justify-content: center; text-align: center;
     }
-    /* 사이렌 번쩍 배경 */
-    @keyframes siren { 0%,100%{background:rgba(180,0,0,0.0);} 50%{background:rgba(180,0,0,0.55);} }
-    .siren-bg { position: absolute; inset: 0; pointer-events: none; animation: siren 0.5s infinite; }
-    /* 간수 실루엣 슬라이드인 */
-    @keyframes guardSlide { from { transform: translateX(-120%) scaleX(-1); opacity:0; } to { transform: translateX(0) scaleX(-1); opacity:0.85; } }
-    .guard-img {
-      position: absolute; bottom: 0; left: 0; width: 55%; max-width: 500px;
-      object-fit: contain; opacity: 0;
-      animation: guardSlide 1.2s cubic-bezier(0.25,0.46,0.45,0.94) 0.5s forwards;
-      filter: brightness(0.25) sepia(1) hue-rotate(-10deg);
-    }
+    /* 사이렌 번쩍 배경 및 간수 연출 */
+    @keyframes pulse-vignette { from { box-shadow: inset 0 0 80px 20px rgba(0,0,0,0.9); } to { box-shadow: inset 0 0 200px 80px rgba(180,0,0,0.95); } }
+    .siren-bg { position: absolute; inset: 0; pointer-events: none; animation: pulse-vignette 1s infinite alternate; }
     /* 카운트다운 */
     @keyframes countPop { 0%{transform:scale(2);opacity:0;} 60%{transform:scale(1.1);opacity:1;} 100%{transform:scale(1);opacity:1;} }
     .event-countdown {
@@ -241,12 +233,12 @@
     }
     .keyhunt-desc { font-size: 1rem; color: #ccc; margin-bottom: 2rem; line-height: 1.6; }
     .keyhunt-grid {
-      display: grid; grid-template-columns: repeat(4,1fr); gap: 0.8rem; margin-bottom: 1.5rem;
+      display: grid; grid-template-columns: repeat(6,1fr); gap: 4px; margin-bottom: 1.5rem;
     }
     .keyhunt-cell {
       aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 1px solid #333;
-      border-radius: 8px; cursor: pointer; display: flex; align-items: center;
-      justify-content: center; font-size: 1.5rem; transition: all 0.2s;
+      border-radius: 6px; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 1.3rem; transition: all 0.2s; user-select: none;
     }
     .keyhunt-cell:hover { background: rgba(201,162,39,0.15); border-color: var(--gold); }
     .keyhunt-cell.found { background: rgba(201,162,39,0.3); border-color: var(--gold); animation: countPop 0.3s; }
@@ -268,6 +260,32 @@
     .map-cell.target { background: #333; color: var(--gold); font-size: 1.2rem; border: 1px dashed var(--gold); }
     .map-cell.visited.target { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
     .map-cell.guard { background: #400000; color: #ff6666; border-color: #ff0000; cursor: not-allowed; font-size: 0.8rem;}
+    /* Traitors Frames */
+    .traitors-frames {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+    .traitor-frame {
+      border: 3px solid #1a1a1a; background: #050505; padding: 10px 4px; text-align: center;
+      border-radius: 2px; width: calc(20% - 7px); min-width: 60px; position: relative;
+      box-shadow: 3px 3px 8px rgba(0,0,0,0.9); transition: all 0.3s;
+    }
+    .traitor-frame::before {
+      content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;
+      border: 1px dashed #333; pointer-events: none;
+    }
+    .traitor-frame.target {
+      border-color: var(--red); background: rgba(100,0,0,0.2); animation: pulse-border 1.5s infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: var(--red); box-shadow: 0 0 10px rgba(160,16,16,0.6); }
+      50% { border-color: #ff4444; box-shadow: 0 0 20px rgba(255,68,68,0.9); }
+    }
+    .traitor-icon { font-size: 1.8rem; margin-bottom: 6px; filter: grayscale(100%) opacity(0.3); }
+    .traitor-frame.target .traitor-icon { filter: none; opacity: 1; text-shadow: 0 0 10px var(--gold); }
+    .traitor-role { font-size: 0.65rem; color: #777; margin-bottom: 2px; word-break: keep-all; letter-spacing: -0.5px; }
+    .traitor-name { font-size: 0.85rem; font-weight: bold; color: #bbb; }
+    .traitor-frame.target .traitor-role { color: var(--gold); font-weight: bold; }
+    .traitor-frame.target .traitor-name { color: #ff4444; font-size: 0.95rem; }
 
   </style>
 </head>
@@ -297,30 +315,32 @@
 </div>
 
 <!-- ===== 간수 출현 이벤트 오버레이 ===== -->
-<div id="guard-event-overlay">
+<div id="guard-event-overlay" style="display:none; position:fixed; inset:0; z-index:9500; background:none; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
   <div class="siren-bg"></div>
-  <img class="guard-img" src="assets/guard_silhouette.jpg" alt="간수">
-  <div id="guard-text-area" style="position:relative; z-index:10; padding: 2rem;">
-    <div class="event-title" id="guard-title">⚠️ 간수 출현!</div>
-    <div class="event-subtitle" id="guard-subtitle">발소리가 들린다... 꼼짝 마!</div>
-    <div class="event-countdown" id="guard-countdown">3</div>
-    <div class="event-survived" id="guard-survived">살았다... 계속 이동하라!</div>
+  <div id="guard-text-area" style="position:relative; z-index:10; padding: 2.5rem; background:rgba(0,0,0,0.9); border:2px solid #555; border-radius:12px; box-shadow:0 0 50px #000;">
+    <div class="event-title" id="guard-title">⚠️ 발소리가 들린다...</div>
+    <div class="event-subtitle" id="guard-subtitle" style="margin-bottom:1.5rem; font-size:1.1rem; color:#aaa;">간수가 다가오고 있습니다. 들키지 않게 숨을 참으세요!</div>
+    <button id="guard-hold-breath-btn" class="btn" style="background:#800000; color:#fff;" onclick="startGuardHoldBreath()">🤫 숨 참기 (클릭)</button>
+    <div class="event-countdown" id="guard-countdown" style="display:none; font-size:6rem; margin-top:1rem; color:#ff4444; text-shadow:0 0 20px #ff0000;">3</div>
+    <div class="event-survived" id="guard-survived" style="display:none; color:#22c55e; margin-top:1rem; font-size:1.5rem; font-weight:bold;">간수가 지나갔다...</div>
   </div>
   <audio id="sfx-footstep" src="https://assets.mixkit.co/active_storage/sfx/1256/1256-preview.mp3" preload="auto"></audio>
   <audio id="sfx-heartbeat" src="https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3" preload="auto"></audio>
 </div>
 
 <!-- ===== 열쇠 탐색 이벤트 오버레이 ===== -->
-<div id="keyhunt-event-overlay" style="background: rgba(0,0,0,0.97);">
-  <div class="keyhunt-area">
-    <div class="keyhunt-title">🗝️ 어딘가에 열쇠가 숨겨져 있다!</div>
-    <div class="keyhunt-desc">
-      노역장 구석 어딘가에 동지가 몰래 숨겨둔 열쇠가 있다.<br>
-      아무도 없는 지금, 빠르게 찾아내야 한다!
-    </div>
-    <div class="keyhunt-grid" id="keyhunt-grid"></div>
-    <div id="keyhunt-result" style="display:none; font-size:1.5rem; font-weight:bold; color: var(--gold); text-shadow: 0 0 20px var(--gold);">🗝️ 찾았다! 계속 이동하라!</div>
+<div id="keyhunt-event-overlay" style="display:none; position:fixed; inset:0; z-index:9500; background: url('assets/seodaemun_factory_1787565120217.jpg') no-repeat center center; background-size: cover;">
+  <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3);" onclick="clickWrongKey()"></div>
+  <div style="position:absolute; top:30px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); padding:1rem 1.5rem; border:2px solid var(--gold); border-radius:12px; text-align:center; pointer-events:none; width:90%; max-width:450px; box-shadow:0 0 20px #000; z-index:2;">
+    <div class="keyhunt-title" style="margin-bottom:0.5rem; font-size:1.5rem;">🗝️ 숨겨진 열쇠를 찾아라!</div>
+    <div class="keyhunt-desc" style="margin:0; font-size:0.9rem;">노역장 배경 속 어딘가에 열쇠가 숨겨져 있습니다.<br>배경 속에 자연스럽게 숨겨진 열쇠를 찾아 터치하세요!</div>
   </div>
+  
+  <div id="hidden-key-item" onclick="clickKeyHuntCell(true)" style="position:absolute; bottom: 18%; right: 22%; width: 45px; height: 45px; display:flex; align-items:center; justify-content:center; font-size:2rem; filter:brightness(0.3) sepia(1) drop-shadow(2px 2px 2px rgba(0,0,0,0.8)); cursor:pointer; opacity:0.85; z-index:3;">
+    🗝️
+  </div>
+
+  <div id="keyhunt-result" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:2.5rem; font-weight:bold; color: var(--gold); text-shadow: 0 0 30px #000, 0 0 20px var(--gold); background:rgba(0,0,0,0.9); padding:2rem; border-radius:16px; z-index:10; border:2px solid var(--gold);">🗝️ 찾았다!</div>
 </div>
 
 <!-- ================= INTRO ================= -->
@@ -412,10 +432,32 @@
       이들의 죄명을 기억하는 자만이 다음 구역으로 나아갈 수 있다.
     </div>
 
-    <div style="background: rgba(255,255,255,0.08); padding: 1rem 1.5rem; border-left: 3px solid var(--red); margin-bottom: 1.5rem; font-size:0.9rem; line-height:2;">
-      <strong>[ 을사오적 ]</strong><br>
-      외부대신 박제순 &nbsp;·&nbsp; 내부대신 이지용 &nbsp;·&nbsp; 군부대신 이근택<br>
-      <span style="color:var(--gold);">학부대신 ???</span> &nbsp;·&nbsp; 농상대신 권중현
+    <div class="traitors-frames">
+      <div class="traitor-frame">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/%E6%9C%B4%E6%96%89%E7%B4%94_Park_Che-soon.jpg/330px-%E6%9C%B4%E6%96%89%E7%B4%94_Park_Che-soon.jpg" class="traitor-icon" style="width:100%; border-radius:4px; filter: grayscale(100%) brightness(0.7);" alt="박제순" />
+        <div class="traitor-role">외부대신</div>
+        <div class="traitor-name">박제순</div>
+      </div>
+      <div class="traitor-frame">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Lee_Ji-yong_Portrait.jpg/330px-Lee_Ji-yong_Portrait.jpg" class="traitor-icon" style="width:100%; border-radius:4px; filter: grayscale(100%) brightness(0.7);" alt="이지용" />
+        <div class="traitor-role">내부대신</div>
+        <div class="traitor-name">이지용</div>
+      </div>
+      <div class="traitor-frame">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Lee_Geun-taek_Portrait.jpg/330px-Lee_Geun-taek_Portrait.jpg" class="traitor-icon" style="width:100%; border-radius:4px; filter: grayscale(100%) brightness(0.7);" alt="이근택" />
+        <div class="traitor-role">군부대신</div>
+        <div class="traitor-name">이근택</div>
+      </div>
+      <div class="traitor-frame target" id="traitor-target-frame">
+        <img id="target-traitor-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Lee_Wan-yong_Portrait.jpg/330px-Lee_Wan-yong_Portrait.jpg" class="traitor-icon" style="width:100%; border-radius:4px; filter: grayscale(100%) brightness(0.2) blur(4px);" alt="???" />
+        <div class="traitor-role">학부대신</div>
+        <div class="traitor-name" id="target-traitor-name">???</div>
+      </div>
+      <div class="traitor-frame">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Gwon_Jung-hyeon_Portrait.jpg/330px-Gwon_Jung-hyeon_Portrait.jpg" class="traitor-icon" style="width:100%; border-radius:4px; filter: grayscale(100%) brightness(0.7);" alt="권중현" />
+        <div class="traitor-role">농상대신</div>
+        <div class="traitor-name">권중현</div>
+      </div>
     </div>
 
     <div class="input-label">🔍 을사늑약에 서명한 '학부대신'(교육장관)은 누구인가?</div>
@@ -657,7 +699,7 @@
 
 <!-- ================= MISSION 8 ================= -->
 <div id="screen-m8" class="screen">
-  <div class="content-box">
+  <div class="content-box" style="background: rgba(10,10,10,0.45); backdrop-filter: blur(2px); border: 2px solid rgba(200,200,200,0.1); box-shadow: 0 0 40px rgba(0,0,0,1);">
     <div class="mission-header">MISSION 10 / 12 : 여옥사</div>
     <div class="mission-title">거울 방의 꺾이지 않는 결의</div>
     
@@ -946,10 +988,17 @@
     if(sel.dataset.val === '이완용') {
       submission.m1_5_pass = true;
       gotKey(11);
+      
+      // 정답 맞추면 액자 사진과 이름 공개
+      document.getElementById('target-traitor-img').style.filter = 'grayscale(100%) brightness(1)';
+      document.getElementById('target-traitor-name').textContent = '이완용';
+      document.getElementById('traitor-target-frame').classList.remove('target');
+      document.getElementById('traitor-target-frame').style.borderColor = '#444';
+      
       showToast('이완용! 그 이름을 기억하자. 다음 구역으로!');
-      setTimeout(() => playTransition('vid_m1_to_m2', 'screen-m2'), 1000);
+      setTimeout(() => playTransition('vid_m1_to_m2', 'screen-m2'), 2500); // 얼굴 볼 시간 2.5초 주기
     } else {
-      showToast('틀렸다! 역사적 사실을 다시 때올려발자!', true);
+      showToast('틀렸다! 역사적 사실을 다시 떠올려보자!', true);
     }
   }
 
@@ -1026,7 +1075,18 @@
       resetMap();
       return;
     }
-    if(mapPath.some(p => p[0]===r && p[1]===c)) return;
+    
+    // 이미 방문한 곳을 다시 눌렀을 때의 처리 (되돌리기 기능)
+    if(mapPath.some(p => p[0]===r && p[1]===c)) {
+      const last = mapPath[mapPath.length-1];
+      // 방금 누른 마지막 타일을 다시 누른 거라면 취소(pop)
+      if(last[0] === r && last[1] === c && mapPath.length > 1) {
+        mapPath.pop();
+        const cell = document.getElementById(`cell-${r}-${c}`);
+        cell.classList.remove('visited');
+      }
+      return;
+    }
     
     const last = mapPath[mapPath.length-1];
     const dr = Math.abs(last[0] - r);
@@ -1144,17 +1204,29 @@
   function triggerGuardEvent(nextScreenId) {
     const overlay = document.getElementById('guard-event-overlay');
     overlay.style.display = 'flex';
-    // 사운드
-    const sfx = document.getElementById('sfx-footstep');
-    if(sfx) sfx.play().catch(()=>{});
-    const hb = document.getElementById('sfx-heartbeat');
-    if(hb) { hb.volume = 0.3; hb.play().catch(()=>{}); }
-    // 콴텐츠 취소
-    document.getElementById('guard-countdown').style.display = 'block';
+    window._guardNext = nextScreenId;
+    
+    // UI 초기화
+    document.getElementById('guard-hold-breath-btn').style.display = 'block';
+    document.getElementById('guard-countdown').style.display = 'none';
     document.getElementById('guard-survived').style.display = 'none';
-    document.getElementById('guard-title').textContent = '⚠️ 간수 출현!';
-    document.getElementById('guard-subtitle').textContent = '발소리가 들린다... 꼼짝 마!';
-    // 카운트다운
+    document.getElementById('guard-title').textContent = '⚠️ 발소리가 들린다...';
+    document.getElementById('guard-subtitle').textContent = '간수가 다가오고 있습니다. 들키지 않게 숨을 참으세요!';
+  }
+
+  function startGuardHoldBreath() {
+    document.getElementById('guard-hold-breath-btn').style.display = 'none';
+    document.getElementById('guard-title').textContent = '숨을 참는 중...';
+    document.getElementById('guard-subtitle').textContent = '절대 움직이지 마세요!';
+    document.getElementById('guard-countdown').style.display = 'block';
+    
+    // 이 타이밍에 사운드를 재생해야 모바일에서도 막히지 않음
+    const sfx = document.getElementById('sfx-footstep');
+    if(sfx) { sfx.volume = 1.0; sfx.play().catch(()=>{}); }
+    const hb = document.getElementById('sfx-heartbeat');
+    if(hb) { hb.volume = 0.5; hb.play().catch(()=>{}); }
+    
+    // 카운트다운 3초
     let count = 3;
     document.getElementById('guard-countdown').textContent = count;
     const timer = setInterval(() => {
@@ -1169,8 +1241,8 @@
         document.getElementById('guard-title').textContent = '간수가 지나갔다...';
         document.getElementById('guard-survived').style.display = 'block';
         setTimeout(() => {
-          overlay.style.display = 'none';
-          showScreen(nextScreenId);
+          document.getElementById('guard-event-overlay').style.display = 'none';
+          showScreen(window._guardNext);
         }, 1500);
       }
     }, 1000);
@@ -1178,37 +1250,38 @@
 
   function triggerKeyHuntEvent(nextScreenId) {
     const overlay = document.getElementById('keyhunt-event-overlay');
-    overlay.style.display = 'flex';
+    overlay.style.display = 'block';
     document.getElementById('keyhunt-result').style.display = 'none';
+    
+    // 열쇠 위치 약간씩 랜덤하게 변경
+    const keyItem = document.getElementById('hidden-key-item');
+    keyItem.style.opacity = '0.85';
+    keyItem.style.pointerEvents = 'auto';
+    keyItem.style.bottom = (10 + Math.random() * 20) + '%';
+    keyItem.style.right = (10 + Math.random() * 80) + '%';
+    
     window._keyHuntNext = nextScreenId;
-    initKeyHuntGrid();
   }
 
-  function initKeyHuntGrid() {
-    const grid = document.getElementById('keyhunt-grid');
-    const icons = ['🧱', '🥣', '🥊', '🦺', '👀', '🦀', '📦', '🥖',
-                   '🔑', '🥞', '🧼', '🔐', '🌏', '🥷', '🧲', '🛒'];
-    // 키를 랜덤 위치에 숨긴다
-    const keyIndex = Math.floor(Math.random() * icons.length);
-    grid.innerHTML = icons.map((icon, i) => `
-      <div class="keyhunt-cell" onclick="clickKeyHuntCell(this, ${i === keyIndex})">${icon}</div>
-    `).join('');
+  function clickWrongKey() {
+    // 배경 잘못 클릭 시 페널티 효과
+    const overlay = document.getElementById('keyhunt-event-overlay');
+    overlay.style.animation = 'errorShake 0.4s';
+    setTimeout(() => { overlay.style.animation = ''; }, 400);
   }
 
-  function clickKeyHuntCell(el, isKey) {
+  function clickKeyHuntCell(isKey) {
     if(isKey) {
-      el.classList.add('found');
-      el.textContent = '🗝️';
+      const keyItem = document.getElementById('hidden-key-item');
+      keyItem.style.filter = 'none';
+      keyItem.style.opacity = '1';
+      keyItem.style.textShadow = '0 0 20px var(--gold)';
+      
       document.getElementById('keyhunt-result').style.display = 'block';
       setTimeout(() => {
         document.getElementById('keyhunt-event-overlay').style.display = 'none';
         showScreen(window._keyHuntNext);
-      }, 1800);
-    } else {
-      el.style.opacity = '0.3';
-      el.style.pointerEvents = 'none';
-      // 없는 곳 클릭 시 그리드 재시작
-      setTimeout(() => initKeyHuntGrid(), 400);
+      }, 2000);
     }
   }
 
