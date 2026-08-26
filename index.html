@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -531,7 +531,7 @@
     <div class="mission-title">고통 속의 침묵</div>
     
     <div class="story-text">
-      <div class="horror-text">"이곳을 무사히 빠져나오다니... 하지만 진짜 지옥은 지금부터다."</div>
+      <div class="horror-text">"정체를 들켜 끌려온 지하 취조실... 진짜 지옥은 지금부터다."</div>
       지하 취조실로 끌려왔다. 차가운 물고문과 손톱을 찌르는 끔찍한 고통이 이어진다.<br>
       순사가 소리친다. <strong style="color:#ff6666;">"네 놈들의 거점이 어디냐! 당장 불어라!"</strong><br><br>
       뼈가 깎이는 고통 속에서도 동지들을 지키기 위해, 당신은 마음속으로 <strong>네 글자</strong>를 끝없이 되뇐다. 그 의지만이 이 문을 열게 할 것이다.
@@ -1066,7 +1066,7 @@
     if(!sel) return showToast('답을 선택하라!', true);
     if(sel.dataset.val === '이완용') {
       submission.m1_5_pass = true;
-      gotKey(11);
+      gotKey(2);
       
       // 정답 맞추면 액자 사진과 이름 공개
       document.getElementById('target-traitor-img').style.filter = 'grayscale(100%) brightness(1)';
@@ -1093,7 +1093,7 @@
     const ans = document.getElementById('m2-ans').value.replace(/\s/g, '');
     if(ans === '대한독립' || ans === '독립만세' || ans === '대한만세') {
       submission.m2_ans = ans;
-      gotKey(2);
+      gotKey(3);
       showToast('고통을 딛고 신념을 지켜냈다!');
       setTimeout(() => showScreen('screen-m3'), 1000);
     } else {
@@ -1106,7 +1106,7 @@
     const pwd = document.getElementById('m3-pwd').value;
     if(pwd === '24530819') {
       submission.m3_pass = true;
-      gotKey(3);
+      gotKey(4);
       showToast('철컥! 마스터 자물쇠가 풀렸다.');
       setTimeout(() => playTransition('vid_m3_to_m4', () => triggerGuardEvent('screen-m4')), 1000);
     } else {
@@ -1139,7 +1139,7 @@
     const ans = document.getElementById('m4-ans').value.trim();
     if(ans === '815') {
       submission.m4_pass = true;
-      gotKey(4);
+      gotKey(5);
       showToast('벽 너머 동지와 무사히 교신했다!');
       setTimeout(() => showScreen('screen-m5'), 1000);
     } else {
@@ -1206,7 +1206,7 @@
       // 6x6 전체 36칸 중 간수 5칸을 제외하면 31칸을 밟아야 함
       if(mapPath.length === 31 && r === 5 && c === 5) {
          submission.m5_pass = true;
-         gotKey(5);
+         gotKey(6);
          showToast('완벽하게 순찰을 피해 독방에 도착했습니다!');
          setTimeout(() => triggerKeyHuntEvent('screen-m6'), 1000);
       } else if (mapPath.length === 31) {
@@ -1243,7 +1243,7 @@
     const a3 = document.getElementById('m6-ans3').value.replace(/\s/g, '');
     if (a1 === '부채꼴' && a2 === '10' && a3 === '중앙감시대') {
       submission.m6_pass = true;
-      gotKey(6);
+      gotKey(7);
       showToast('격벽장의 비밀 구조를 완벽하게 파악했다! 문이 열립니다.');
       setTimeout(() => showScreen('screen-m7'), 1500);
     } else {
@@ -1256,7 +1256,7 @@
     const ans = document.getElementById('m7-ans').value;
     if(ans === '1117') {
       submission.m7_pass = true;
-      gotKey(7);
+      gotKey(8);
       showToast('순찰 시간표 규칙을 정확히 간파했다!');
       setTimeout(() => showScreen('screen-m7_5'), 1000);
     } else {
@@ -1275,7 +1275,7 @@
     const a3ok = q3.dataset.val === '강우규';
     if(a1ok && a2ok && a3ok) {
       submission.m7_5_pass = true;
-      gotKey(12);
+      gotKey(9);
       showToast('의열 투사들의 이름을 마음에 새겼다!');
       setTimeout(() => triggerGuardEvent('screen-m8'), 1000);
     } else {
@@ -1290,7 +1290,7 @@
     if(!sel) return showToast('수감 번호를 선택하라!', true);
     if(sel.dataset.val === '371') {
       submission.m8_pass = true;
-      gotKey(8);
+      gotKey(10);
       showToast('그녀의 숭고한 희생을 영원히 기억합시다.');
       setTimeout(() => triggerGuardEvent('screen-m9'), 1000);
     } else {
@@ -1301,7 +1301,7 @@
   function checkM9() {
     submission.m9_will = document.getElementById('m9-text').value.trim();
     if(submission.m9_will.length < 5) return showToast('마지막 기록을 진심을 담아 남겨주세요.', true);
-    gotKey(9);
+    gotKey(11);
     showToast('눈물을 닦고 마지막 발걸음을 옮깁니다...', false, 4000);
     setTimeout(() => playTransition('vid_m9_to_m10', 'screen-photo'), 4000);
   }
@@ -1582,7 +1582,7 @@
         localStorage.setItem('escape_submissions', JSON.stringify(arr));
       }
       
-      gotKey(10);
+      gotKey(12);
       document.getElementById('cert-name').textContent = submission.name + ' 요원';
       document.getElementById('progress-bar').style.display = 'none';
       showScreen('screen-success');
