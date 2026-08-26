@@ -895,13 +895,13 @@
     }
   } catch(e){ console.warn("Firebase not initialized"); }
 
-  function showToast(msg, isError = false) {
+  function showToast(msg, isError = false, duration = 3000) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.style.background = isError ? 'var(--red)' : 'var(--gold)';
     t.classList.add('show');
     if(isError) triggerAlert();
-    setTimeout(() => t.classList.remove('show'), 3000);
+    setTimeout(() => t.classList.remove('show'), duration);
   }
 
   // 선생님이 만드신 영상 파일의 이름을 정확히 적어주세요.
@@ -1195,8 +1195,8 @@
     submission.m9_will = document.getElementById('m9-text').value.trim();
     if(submission.m9_will.length < 5) return showToast('마지막 기록을 진심을 담아 남겨주세요.', true);
     gotKey(9);
-    showToast('눈물을 닦고 마지막 발걸음을 옮깁니다...');
-    setTimeout(() => playTransition('vid_m9_to_m10', 'screen-photo'), 1000);
+    showToast('눈물을 닦고 마지막 발걸음을 옮깁니다...', false, 4000);
+    setTimeout(() => playTransition('vid_m9_to_m10', 'screen-photo'), 4000);
   }
 
   /* ===== 긴장 이벤트 함수들 ===== */
@@ -1253,12 +1253,23 @@
     overlay.style.display = 'block';
     document.getElementById('keyhunt-result').style.display = 'none';
     
-    // 열쇠 위치 약간씩 랜덤하게 변경
+    // 열쇠가 놓일 자연스러운 위치들 (테이블 위, 구석 바닥 등)
+    const positions = [
+      { bottom: '26%', left: '20%', right: 'auto' },  // 가운데 왼쪽 테이블
+      { bottom: '15%', left: '35%', right: 'auto' },  // 가운데 오른쪽 테이블
+      { bottom: '10%', right: '15%', left: 'auto' },  // 오른쪽 구석 바닥
+      { bottom: '6%', left: '60%', right: 'auto' },   // 중앙 나무판자 바닥
+      { bottom: '20%', left: '8%', right: 'auto' }    // 가장 왼쪽 테이블
+    ];
+    const pos = positions[Math.floor(Math.random() * positions.length)];
+    
     const keyItem = document.getElementById('hidden-key-item');
     keyItem.style.opacity = '0.85';
     keyItem.style.pointerEvents = 'auto';
-    keyItem.style.bottom = (10 + Math.random() * 20) + '%';
-    keyItem.style.right = (10 + Math.random() * 80) + '%';
+    keyItem.style.bottom = pos.bottom;
+    keyItem.style.left = pos.left;
+    keyItem.style.right = pos.right;
+    keyItem.style.transform = `rotate(${Math.floor(Math.random() * 60) - 30}deg)`;
     
     window._keyHuntNext = nextScreenId;
   }
