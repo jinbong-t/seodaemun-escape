@@ -215,9 +215,9 @@
         <td><strong>${esc(d.name)}</strong></td>
         <td>${esc(d.class)} ${esc(String(d.number))}번</td>
         <td>${esc(d.m1_job)}</td>
-        <td>${esc(d.m6_ans)}</td>
-        <td>${esc(d.m7_ans)}</td>
-        <td>${esc(d.m8_ans)}</td>
+        <td>${d.m6_pass ? '✅' : '❌'}</td>
+        <td>${d.m7_pass ? '✅' : '❌'}</td>
+        <td>${d.m8_pass ? '✅' : '❌'}</td>
         <td>${esc(d.m9_will).substring(0, 10)}...</td>
         <td>${esc(d.m10_career)}</td>
         <td>${esc(d.submittedAtLocal)}</td>
