@@ -1312,8 +1312,8 @@
     if(sel.dataset.val === '371') {
       submission.m8_pass = true;
       gotKey(10);
-      showToast('그녀의 숭고한 희생을 영원히 기억합시다.');
-      setTimeout(() => showScreen('screen-m9'), 1000);
+      alert('정답입니다!\n\n[역사 지식 한 토막]\n3·1 운동은 3월 1일 하루 만에 끝난 것이 아니라 전국적으로 퍼져나갔습니다.\n유관순 열사가 주도한 천안 아우내 장터 만세 운동은 그로부터 한 달 뒤인 4월 1일에 일어났답니다.\n\n그녀의 숭고한 희생을 영원히 기억합시다.');
+      showScreen('screen-m9');
     } else {
       showToast('틀렸습니다. 다시 한번 역사적 사실을 떠올려보세요.', true);
     }
