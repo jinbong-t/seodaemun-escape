@@ -198,7 +198,7 @@
       renderTable();
     } catch(err) {
       console.error(err);
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red;">데이터를 불러오지 못했습니다.</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:red; padding: 2rem;">데이터를 불러오지 못했습니다.<br><br><span style="font-size:0.85rem; color:#888;">[에러 내용: ${err.message}]</span><br><br>※ Firebase 데이터베이스 권한(규칙)이 만료되었거나 설정이 잘못되었을 수 있습니다.</td></tr>`;
     }
   }
 
@@ -316,7 +316,7 @@
       renderPhotos();
     } catch(err) {
       console.error(err);
-      grid.innerHTML = '<div style="text-align:center; color:red; padding: 2rem; grid-column: 1/-1;">사진을 불러오지 못했습니다.</div>';
+      grid.innerHTML = `<div style="text-align:center; color:red; padding: 2rem; grid-column: 1/-1;">사진을 불러오지 못했습니다.<br><br><span style="font-size:0.85rem; color:#888;">[에러 내용: ${err.message}]</span></div>`;
     }
   }
 
