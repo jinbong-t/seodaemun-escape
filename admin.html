@@ -344,10 +344,15 @@
           <div class="photo-location ${p.location}">
             ${p.location === 'indoor' ? '🏛️ 실내 - 유관순 열사 수감방' : '🌳 실외 - 통곡의 미루나무'}
           </div>
-          ${p.approved
-            ? '<div><span class="badge badge-approved">✅ 승인 완료</span></div>'
-            : `<button class="btn-approve" id="approve-btn-${p.id}" onclick="approvePhoto('${p.id}')">✅ 승인 (다음 미션 열기)</button>`
-          }
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem;">
+            <div style="flex: 1;">
+              ${p.approved
+                ? '<span class="badge badge-approved" style="padding: 0.7rem; display: block; text-align: center; border-radius: 8px; width: 100%;">✅ 승인 완료</span>'
+                : `<button class="btn-approve" id="approve-btn-${p.id}" onclick="approvePhoto('${p.id}')">✅ 승인</button>`
+              }
+            </div>
+            <a href="${p.photoBase64}" download="${esc(p.studentName)}_${p.location}.jpg" class="btn" style="background: #e2e8f0; color: #333; text-decoration: none; padding: 0.7rem; font-size: 0.9rem; text-align: center; border-radius: 8px; white-space: nowrap;" title="이미지 다운로드">💾 저장</a>
+          </div>
         </div>
       </div>
     `).join('');
