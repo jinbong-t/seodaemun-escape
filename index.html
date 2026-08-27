@@ -899,21 +899,21 @@
       <div style="font-size: 2.2rem; font-weight: 900; color: #8b0000; letter-spacing: 15px; margin-bottom: 2rem; border-bottom: 2px solid #8b0000; display: inline-block; padding-bottom: 0.5rem;">선 서 (誓 宣)</div>
       
       <!-- 선서 내용 -->
-      <div style="font-size: 1.25rem; line-height: 2.2; text-align: left; font-weight: 900; letter-spacing: 1px;">
-        나는 조국의 독립과 자유를 회복하기 위하여<br>
-        서대문 형무소의 모진 시련을 이겨내고<br>
-        순국선열들의 숭고한 뜻을 받들어<br>
-        나의 굳은 다짐을 조국에 바치기로 맹세하나이다.
+      <div style="font-size: 1.25rem; line-height: 2.2; text-align: left; font-weight: 900; letter-spacing: 1px; position: relative; z-index: 2;">
+        나는 서대문 형무소의 모진 시련을 이겨내고<br>
+        조국의 독립과 자유를 위해 헌신하신<br>
+        순국선열들의 숭고한 뜻을 이어받아<br>
+        현재 나의 삶에 최선을 다할 것을 맹세하나이다.
       </div>
       
       <!-- 날짜 및 이름 -->
-      <div style="margin-top: 3rem; font-size: 1.2rem; font-weight: 900; text-align: right; line-height: 1.8;">
-        대한민국 <span id="cert-date">1919년 3월 1일</span><br>
+      <div style="margin-top: 3rem; font-size: 1.2rem; font-weight: 900; text-align: right; line-height: 1.8; position: relative; z-index: 2;">
+        대한민국 <span id="cert-date"></span><br>
         선서인 <span id="cert-name" style="font-size: 1.6rem; color: #8b0000; margin-left: 10px;">요원 이름</span>
       </div>
 
       <!-- 손도장 (혈서 느낌) -->
-      <img src="assets/handprint.jpg" alt="혈서 손도장" style="position: absolute; bottom: 30px; right: 30px; width: 110px; filter: contrast(1.3) brightness(0.85) sepia(0.3) hue-rotate(-10deg); mix-blend-mode: multiply; opacity: 0.85;">
+      <img src="assets/handprint.jpg" alt="혈서 손도장" style="position: absolute; bottom: 30px; left: 40px; width: 110px; filter: contrast(1.3) brightness(0.85) sepia(0.3) hue-rotate(-10deg); mix-blend-mode: multiply; opacity: 0.85; z-index: 1;">
     </div>
 
     <div style="font-size: 0.8rem; color: #777;">화면을 캡처하여 간직하세요.</div>
@@ -1601,6 +1601,13 @@
       }
       
       gotKey(12);
+      
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = today.getMonth() + 1;
+      const dd = today.getDate();
+      document.getElementById('cert-date').textContent = `${yyyy}년 ${mm}월 ${dd}일`;
+      
       document.getElementById('cert-name').textContent = submission.name + ' 요원';
       document.getElementById('progress-bar').style.display = 'none';
       showScreen('screen-success');
