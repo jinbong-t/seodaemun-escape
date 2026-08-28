@@ -128,6 +128,7 @@
               <tr>
                 <th>이름</th>
                 <th>학반/번호</th>
+                <th>상태</th>
                 <th>M1 위장직업</th>
                 <th>M6(단어) 해독</th>
                 <th>M7(시간표) 추리</th>
@@ -227,7 +228,7 @@
     document.getElementById('total-count').textContent = allData.length;
     const tbody = document.getElementById('table-body');
     if(allData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">제출된 데이터가 없습니다.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">제출된 데이터가 없습니다.</td></tr>';
       return;
     }
 
@@ -235,6 +236,7 @@
       <tr>
         <td><strong>${esc(d.name)}</strong></td>
         <td>${esc(d.class)} ${esc(String(d.number))}번</td>
+        <td>${d.status === '진행 중' ? '<span class="badge badge-pending" style="white-space:nowrap;">진행 중</span>' : '<span class="badge badge-pass" style="white-space:nowrap;">완료</span>'}</td>
         <td>${esc(d.m1_job)}</td>
         <td>${d.m6_pass ? '✅' : '❌'}</td>
         <td>${d.m7_pass ? '✅' : '❌'}</td>
@@ -295,8 +297,8 @@
 
   function exportCSV() {
     if(allData.length === 0) return alert('데이터가 없습니다.');
-    const headers = ['이름','학반','번호','M1_직업','M1_이유','M2_의지','M3_기호','M4_타음','M5_지도','M6_단어','M7_시간표','M8_수감번호','M9_유언장','M10_미래직업','M10_나의다짐','제출시간'];
-    const cols = ['name','class','number','m1_job','m1_reason','m2_ans','m3_pass','m4_pass','m5_pass','m6_pass','m7_pass','m8_pass','m9_will','m10_career','m10_pledge','submittedAtLocal'];
+    const headers = ['이름','학반','번호','상태','M1_직업','M1_이유','M2_의지','M3_기호','M4_타음','M5_지도','M6_단어','M7_시간표','M8_수감번호','M9_유언장','M10_미래직업','M10_나의다짐','제출시간'];
+    const cols = ['name','class','number','status','m1_job','m1_reason','m2_ans','m3_pass','m4_pass','m5_pass','m6_pass','m7_pass','m8_pass','m9_will','m10_career','m10_pledge','submittedAtLocal'];
     
     const rows = [headers.join(',')];
     allData.forEach(d => {

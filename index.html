@@ -944,7 +944,8 @@
     m9_will: '',
     photo_location: '', photo_approved: false,
     m1_5_pass: false, m7_5_pass: false,
-    m10_career: '', m10_pledge: ''
+    m10_career: '', m10_pledge: '',
+    status: '시작 전'
   };
 
   const BGS = {
@@ -1010,6 +1011,8 @@
     'vid_ending': '3. 엔딩.mp4'
   };
 
+  let docId = null;
+
   function playTransition(vidKey, nextArg) {
     if(vidKey === 'vid_intro') {
       submission.name = document.getElementById('inp-name').value.trim();
@@ -1017,6 +1020,23 @@
       submission.number = document.getElementById('inp-num').value.trim();
       if(!submission.name || !submission.class || !submission.number) {
         return showToast('신분증 정보(이름, 학반, 번호)를 모두 입력해라!', true);
+      }
+      
+      // 시작할 때 상태를 저장
+      submission.status = '진행 중';
+      submission.submittedAt = new Date();
+      submission.submittedAtLocal = submission.submittedAt.toLocaleString('ko-KR');
+      
+      if(db) {
+        db.collection('escape_submissions').add(submission).then(ref => {
+          docId = ref.id;
+        }).catch(err => console.warn(err));
+      } else {
+         let arr = JSON.parse(localStorage.getItem('escape_submissions') || '[]');
+         submission.id = Date.now().toString();
+         docId = submission.id;
+         arr.push(submission);
+         localStorage.setItem('escape_submissions', JSON.stringify(arr));
       }
     }
     const vidSrc = VIDEOS[vidKey];
@@ -1587,16 +1607,27 @@
     btn.textContent = '데이터 전송 중...';
     btn.disabled = true;
 
+    submission.status = '완료';
     submission.submittedAt = new Date();
     submission.submittedAtLocal = submission.submittedAt.toLocaleString('ko-KR');
 
     try {
       if(db) {
-        await db.collection('escape_submissions').add(submission);
+        if(docId) {
+          await db.collection('escape_submissions').doc(docId).update(submission);
+        } else {
+          await db.collection('escape_submissions').add(submission);
+        }
       } else {
         let arr = JSON.parse(localStorage.getItem('escape_submissions') || '[]');
-        submission.id = Date.now().toString();
-        arr.push(submission);
+        if(docId) {
+          const idx = arr.findIndex(x => x.id === docId);
+          if(idx !== -1) arr[idx] = submission;
+          else arr.push(submission);
+        } else {
+          submission.id = Date.now().toString();
+          arr.push(submission);
+        }
         localStorage.setItem('escape_submissions', JSON.stringify(arr));
       }
       
