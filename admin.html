@@ -111,6 +111,7 @@
       <div class="tabs">
         <button class="tab-btn active" id="tab-btn-data" onclick="switchTab('data')">📋 제출 목록</button>
         <button class="tab-btn" id="tab-btn-photo" onclick="switchTab('photo')">📸 사진 승인 <span class="photo-count-badge" id="pending-count">0</span></button>
+        <button class="tab-btn" id="tab-btn-settings" onclick="switchTab('settings')">⚙️ 설정</button>
       </div>
       <button class="btn btn-green" onclick="exportCSV()">📥 CSV 다운로드</button>
       <button class="btn btn-primary" onclick="refreshAll()">🔄 새로고침</button>
@@ -162,6 +163,20 @@
         </div>
       </div>
     </div>
+
+    <!-- 탭 3: 설정 -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">⚙️ 대시보드 설정</h2>
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; max-width: 500px;">
+          <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text);">🏫 반별 보기 필터</h3>
+          <p style="font-size: 0.85rem; color: var(--text2); margin-bottom: 1rem;">특정 반 학생들의 데이터와 사진만 모아서 볼 수 있습니다.</p>
+          <select id="class-filter" onchange="applyClassFilter()" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--border); font-size: 1rem;">
+            <option value="all">모든 반 전체 보기</option>
+          </select>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- 이미지 확대 모달 -->
@@ -190,6 +205,40 @@
   let allPhotos = [];
   let db = null;
   let currentTab = 'data';
+  let currentClassFilter = 'all';
+
+  function applyClassFilter() {
+    currentClassFilter = document.getElementById('class-filter').value;
+    renderTable();
+    renderPhotos();
+    showAdminToast(`👀 필터 적용됨: ${currentClassFilter === 'all' ? '전체 보기' : currentClassFilter}`);
+  }
+
+  function updateClassFilterOptions() {
+    const filterSelect = document.getElementById('class-filter');
+    if (!filterSelect) return;
+    const currentValue = filterSelect.value;
+    
+    const classes = new Set();
+    allData.forEach(d => { if(d.class) classes.add(d.class); });
+    allPhotos.forEach(p => { if(p.studentClass) classes.add(p.studentClass); });
+    
+    const sortedClasses = Array.from(classes).sort();
+    
+    let optionsHtml = '<option value="all">모든 반 전체 보기</option>';
+    sortedClasses.forEach(c => {
+      optionsHtml += `<option value="${c}">${c}</option>`;
+    });
+    
+    filterSelect.innerHTML = optionsHtml;
+    
+    if(sortedClasses.includes(currentValue)) {
+      filterSelect.value = currentValue;
+    } else {
+      filterSelect.value = 'all';
+      currentClassFilter = 'all';
+    }
+  }
 
   try {
     if(typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== '여기에-API-키-입력'){
@@ -224,6 +273,7 @@
         const raw = localStorage.getItem('escape_submissions');
         allData = raw ? JSON.parse(raw).reverse() : [];
       }
+      updateClassFilterOptions();
       renderTable();
     } catch(err) {
       console.error(err);
@@ -232,14 +282,15 @@
   }
 
   function renderTable() {
-    document.getElementById('total-count').textContent = allData.length;
+    const filteredData = currentClassFilter === 'all' ? allData : allData.filter(d => d.class === currentClassFilter);
+    document.getElementById('total-count').textContent = filteredData.length;
     const tbody = document.getElementById('table-body');
-    if(allData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">제출된 데이터가 없습니다.</td></tr>';
+    if(filteredData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">조건에 맞는 제출된 데이터가 없습니다.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = allData.map(d => `
+    tbody.innerHTML = filteredData.map(d => `
       <tr>
         <td><strong>${esc(d.name)}</strong></td>
         <td>${esc(d.class)} ${esc(String(d.number))}번</td>
@@ -303,12 +354,13 @@
   }
 
   function exportCSV() {
-    if(allData.length === 0) return alert('데이터가 없습니다.');
+    const filteredData = currentClassFilter === 'all' ? allData : allData.filter(d => d.class === currentClassFilter);
+    if(filteredData.length === 0) return alert('데이터가 없습니다.');
     const headers = ['이름','학반','번호','상태','M1_직업','M1_이유','M2_의지','M3_기호','M4_타음','M5_지도','M6_단어','M7_시간표','M8_수감번호','M9_유언장','M10_미래직업','M10_나의다짐','제출시간'];
     const cols = ['name','class','number','status','m1_job','m1_reason','m2_ans','m3_pass','m4_pass','m5_pass','m6_pass','m7_pass','m8_pass','m9_will','m10_career','m10_pledge','submittedAtLocal'];
     
     const rows = [headers.join(',')];
-    allData.forEach(d => {
+    filteredData.forEach(d => {
       const r = cols.map(c => {
         let v = String(d[c]||'').replace(/\n/g, ' ');
         if(v.includes(',') || v.includes('"')) v = '"' + v.replace(/"/g, '""') + '"';
@@ -363,6 +415,7 @@
         unsubscribePhotos = db.collection('photo_missions').orderBy('submittedAt', 'desc')
           .onSnapshot(snap => {
             allPhotos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateClassFilterOptions();
             renderPhotos();
 
             if(!isInitialLoad) {
@@ -395,6 +448,7 @@
           });
       } else {
         allPhotos = [];
+        updateClassFilterOptions();
         renderPhotos();
       }
     } catch(err) {
@@ -405,8 +459,9 @@
 
   function renderPhotos() {
     const grid = document.getElementById('photo-grid');
-    const total = allPhotos.length;
-    const pending = allPhotos.filter(p => !p.approved).length;
+    const filteredPhotos = currentClassFilter === 'all' ? allPhotos : allPhotos.filter(p => p.studentClass === currentClassFilter);
+    const total = filteredPhotos.length;
+    const pending = filteredPhotos.filter(p => !p.approved && !p.rejected).length;
 
     document.getElementById('photo-total').textContent = total;
     document.getElementById('pending-count').textContent = pending;
@@ -416,7 +471,7 @@
       return;
     }
 
-    grid.innerHTML = allPhotos.map(p => `
+    grid.innerHTML = filteredPhotos.map(p => `
       <div class="photo-card" id="photo-card-${p.id}">
         <img src="${p.photoBase64}" alt="인증샷" onclick="openImgModal('${p.id}')" title="클릭하면 크게 볼 수 있습니다">
         <div class="photo-card-body">
@@ -426,10 +481,13 @@
             ${p.location === 'indoor' ? '🏛️ 실내 - 유관순 열사 수감방' : '🌳 실외 - 통곡의 미루나무'}
           </div>
           <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem;">
-            <div style="flex: 1;">
+            <div style="flex: 1; display: flex; gap: 0.3rem;">
               ${p.approved
                 ? '<span class="badge badge-approved" style="padding: 0.7rem; display: block; text-align: center; border-radius: 8px; width: 100%;">✅ 승인 완료</span>'
-                : `<button class="btn-approve" id="approve-btn-${p.id}" onclick="approvePhoto('${p.id}')">✅ 승인</button>`
+                : (p.rejected 
+                    ? '<span class="badge badge-fail" style="padding: 0.7rem; display: block; text-align: center; border-radius: 8px; width: 100%;">❌ 반려됨</span>'
+                    : `<button class="btn-approve" id="approve-btn-${p.id}" onclick="approvePhoto('${p.id}')" style="flex:1; padding:0.7rem; font-size:0.9rem;">✅ 승인</button>
+                       <button class="btn" id="reject-btn-${p.id}" onclick="rejectPhoto('${p.id}')" style="background:#dc2626; color:white; padding: 0.7rem; border-radius:8px; border:none; cursor:pointer; font-weight:bold; flex:1; font-size:0.9rem;">❌ 반려</button>`)
               }
             </div>
             <a href="${p.photoBase64}" download="${esc(p.studentName)}_${p.location}.jpg" class="btn" style="background: #e2e8f0; color: #333; text-decoration: none; padding: 0.7rem; font-size: 0.9rem; text-align: center; border-radius: 8px; white-space: nowrap;" title="이미지 다운로드">💾 저장</a>
@@ -456,8 +514,40 @@
       }
     } catch(err) {
       console.error(err);
-      btn.textContent = '✅ 승인 (다음 미션 열기)';
+      btn.textContent = '✅ 승인';
       btn.disabled = false;
+      showAdminToast('오류 발생: ' + err.message, true);
+    }
+  }
+
+  async function rejectPhoto(photoId) {
+    const reason = prompt("반려 사유를 입력하세요 (예: 얼굴이 안 보임). 취소하면 반려되지 않습니다.");
+    if (reason === null) return; // User cancelled
+    
+    const btnR = document.getElementById('reject-btn-' + photoId);
+    const btnA = document.getElementById('approve-btn-' + photoId);
+    if(btnR) { btnR.textContent = '처리중...'; btnR.disabled = true; }
+    if(btnA) { btnA.disabled = true; }
+
+    try {
+      if(db) {
+        await db.collection('photo_missions').doc(photoId).update({ 
+          rejected: true, 
+          rejectReason: reason || '사진이 기준에 맞지 않아 반려되었습니다.' 
+        });
+        
+        const idx = allPhotos.findIndex(p => p.id === photoId);
+        if(idx !== -1) {
+          allPhotos[idx].rejected = true;
+          allPhotos[idx].rejectReason = reason;
+        }
+        renderPhotos();
+        showAdminToast('❌ 반려 처리되었습니다.');
+      }
+    } catch(err) {
+      console.error(err);
+      if(btnR) { btnR.textContent = '❌ 반려'; btnR.disabled = false; }
+      if(btnA) { btnA.disabled = false; }
       showAdminToast('오류 발생: ' + err.message, true);
     }
   }

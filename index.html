@@ -1611,12 +1611,28 @@
     photoPollingTimer = setInterval(async () => {
       try {
         const doc = await db.collection('photo_missions').doc(photoDocId).get();
-        if(doc.exists && doc.data().approved === true) {
-          clearInterval(photoPollingTimer);
-          photoApproved();
+        if(doc.exists) {
+          if(doc.data().approved === true) {
+            clearInterval(photoPollingTimer);
+            photoApproved();
+          } else if(doc.data().rejected === true) {
+            clearInterval(photoPollingTimer);
+            photoRejected(doc.data().rejectReason || '인증 사진이 선생님에 의해 반려되었습니다. 다시 찍어주세요.');
+          }
         }
       } catch(e) { console.warn('polling error', e); }
     }, 3000); // 3초마다 확인
+  }
+
+  function photoRejected(reason) {
+    showToast('❌ 반려됨: ' + reason, true, 5000);
+    document.getElementById('photo-form-area').style.display = 'block';
+    document.getElementById('photo-waiting-area').style.display = 'none';
+    const btn = document.getElementById('btn-photo-submit');
+    if(btn) {
+      btn.textContent = '📤 다시 사진 제출 및 승인 요청';
+      btn.disabled = false;
+    }
   }
 
   function photoApproved() {
