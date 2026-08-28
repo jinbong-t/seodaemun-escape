@@ -1013,6 +1013,26 @@
 
   let docId = null;
 
+  async function saveProgress() {
+    if(!docId) return;
+    submission.submittedAt = new Date();
+    submission.submittedAtLocal = submission.submittedAt.toLocaleString('ko-KR');
+    try {
+      if(db) {
+        await db.collection('escape_submissions').doc(docId).update(submission);
+      } else {
+        let arr = JSON.parse(localStorage.getItem('escape_submissions') || '[]');
+        const idx = arr.findIndex(x => x.id === docId);
+        if(idx !== -1) {
+          arr[idx] = submission;
+          localStorage.setItem('escape_submissions', JSON.stringify(arr));
+        }
+      }
+    } catch(err) {
+      console.warn("진행 상황 저장 실패:", err);
+    }
+  }
+
   function playTransition(vidKey, nextArg) {
     if(vidKey === 'vid_intro') {
       submission.name = document.getElementById('inp-name').value.trim();
@@ -1094,6 +1114,7 @@
     submission.m1_reason = document.getElementById('m1-reason').value.trim();
     if(!submission.m1_job) return showToast('위장할 직업을 선택해라!', true);
     if(submission.m1_reason.length < 5) return showToast('순사를 속이려면 이유를 그럴듯하게 적어라!', true);
+    saveProgress();
     gotKey(1);
     showToast('순사를 성공적으로 속였다!');
     setTimeout(() => showScreen('screen-m1_5'), 1000);
@@ -1105,6 +1126,7 @@
     if(!sel) return showToast('답을 선택하라!', true);
     if(sel.dataset.val === '이완용') {
       submission.m1_5_pass = true;
+      saveProgress();
       gotKey(2);
       
       // 정답 맞추면 액자 사진과 이름 공개
@@ -1133,6 +1155,7 @@
     const ans = document.getElementById('m2-ans').value.replace(/\s/g, '');
     if(ans === '대한독립' || ans === '독립만세' || ans === '대한만세') {
       submission.m2_ans = ans;
+      saveProgress();
       gotKey(3);
       showToast('고통을 딛고 신념을 지켜냈다!');
       setTimeout(() => showScreen('screen-m3'), 1000);
@@ -1146,6 +1169,7 @@
     const pwd = document.getElementById('m3-pwd').value;
     if(pwd === '24530819') {
       submission.m3_pass = true;
+      saveProgress();
       gotKey(4);
       showToast('철컥! 마스터 자물쇠가 풀렸다.');
       setTimeout(() => playTransition('vid_m3_to_m4', () => triggerGuardEvent('screen-m4')), 1000);
@@ -1179,6 +1203,7 @@
     const ans = document.getElementById('m4-ans').value.trim();
     if(ans === '815') {
       submission.m4_pass = true;
+      saveProgress();
       gotKey(5);
       showToast('벽 너머 동지와 무사히 교신했다!');
       setTimeout(() => showScreen('screen-m5'), 1000);
@@ -1246,6 +1271,7 @@
       // 6x6 전체 36칸 중 간수 5칸을 제외하면 31칸을 밟아야 함
       if(mapPath.length === 31 && r === 5 && c === 5) {
          submission.m5_pass = true;
+         saveProgress();
          gotKey(6);
          alert('독방에 무사히 도착하여 고문받던 김 동지를 성공적으로 구출했습니다!');
          showToast('완벽하게 순찰을 피해 독방에 도착했습니다!');
@@ -1284,6 +1310,7 @@
     const a3 = document.getElementById('m6-ans3').value.replace(/\s/g, '');
     if (a1 === '부채꼴' && a2 === '10' && a3 === '중앙감시대') {
       submission.m6_pass = true;
+      saveProgress();
       gotKey(7);
       showToast('격벽장의 비밀 구조를 완벽하게 파악했다! 문이 열립니다.');
       setTimeout(() => showScreen('screen-m7'), 1500);
@@ -1297,6 +1324,7 @@
     const ans = document.getElementById('m7-ans').value;
     if(ans === '1117') {
       submission.m7_pass = true;
+      saveProgress();
       gotKey(8);
       showToast('순찰 시간표 규칙을 정확히 간파했다!');
       setTimeout(() => showScreen('screen-m7_5'), 1000);
@@ -1316,6 +1344,7 @@
     const a3ok = q3.dataset.val === '강우규';
     if(a1ok && a2ok && a3ok) {
       submission.m7_5_pass = true;
+      saveProgress();
       gotKey(9);
       showToast('의열 투사들의 이름을 마음에 새겼다!');
       setTimeout(() => triggerGuardEvent('screen-m8'), 1000);
@@ -1331,6 +1360,7 @@
     if(!sel) return showToast('수감 번호를 선택하라!', true);
     if(sel.dataset.val === '371') {
       submission.m8_pass = true;
+      saveProgress();
       gotKey(10);
       alert('[역사 지식 한 토막]\n3·1 운동은 3월 1일 하루 만에 끝난 것이 아니라 전국 각지로 퍼져나갔습니다.\n유관순 열사 등이 함께 준비하고 주도한 천안 아우내 장터 만세운동은 3·1 운동이 시작된 지 한 달 뒤인 1919년 4월 1일에 일어났습니다.\n\n그녀의 숭고한 희생을 영원히 기억합시다.');
       showScreen('screen-m9');
@@ -1342,6 +1372,7 @@
   function checkM9() {
     submission.m9_will = document.getElementById('m9-text').value.trim();
     if(submission.m9_will.length < 5) return showToast('마지막 기록을 진심을 담아 남겨주세요.', true);
+    saveProgress();
     gotKey(11);
     showToast('눈물을 닦고 마지막 발걸음을 옮깁니다...', false, 4000);
     setTimeout(() => playTransition('vid_m9_to_m10', 'screen-photo'), 4000);
@@ -1511,6 +1542,7 @@
       const base64 = await compressImage(file, 800);
       
       submission.photo_location = selectedLocation;
+      saveProgress();
       const locLabel = selectedLocation === 'indoor' ? '실내(유관순 열사 방)' : '실외(통곡의 미루나무)';
 
       const photoData = {
@@ -1590,6 +1622,7 @@
   function photoApproved() {
     clearInterval(photoPollingTimer);
     submission.photo_approved = true;
+    saveProgress();
     showToast('📸 선생님이 인증사진을 확인했습니다! 마지막 임무로 이동합니다.');
     setTimeout(() => playTransition('vid_ending', 'screen-m10'), 1500);
   }
@@ -1650,6 +1683,20 @@
       btn.disabled = false;
     }
   }
+
+  // 화면 하단 고정 푸터 (네모칸 애니메이션과 분리)
+  document.addEventListener('DOMContentLoaded', () => {
+    const footerHtml = `
+      <div style="position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; font-size: 0.85rem; color: #999;">
+        <a href="개인정보처리방침.md" target="_blank" style="color: #999; text-decoration: underline; margin-right: 10px;">개인정보처리방침</a> | 
+        <a href="이용약관.md" target="_blank" style="color: #999; text-decoration: underline; margin-left: 10px; margin-right: 10px;">이용약관</a> | 
+        By. Lee Jin Young
+      </div>
+    `;
+    document.querySelectorAll('.screen').forEach(screen => {
+      screen.insertAdjacentHTML('beforeend', footerHtml);
+    });
+  });
 </script>
 </body>
 </html>

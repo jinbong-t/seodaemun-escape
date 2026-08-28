@@ -177,6 +177,13 @@
     </div>
   </div>
 
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 2rem 1rem; color: var(--text2); font-size: 0.85rem;">
+    <a href="개인정보처리방침.md" target="_blank" style="color: inherit; text-decoration: none;">개인정보처리방침</a> &nbsp;|&nbsp; 
+    <a href="이용약관.md" target="_blank" style="color: inherit; text-decoration: none;">이용약관</a> &nbsp;|&nbsp; 
+    By. Lee Jin Young
+  </footer>
+
 <script src="firebase-config.js"></script>
 <script>
   let allData = [];
@@ -325,21 +332,74 @@
   };
 
   /* ========== 사진 승인 관련 ========== */
-  async function loadPhotos() {
+  let unsubscribePhotos = null;
+
+  function playAlertSound() {
+    try {
+      // 짧고 경쾌한 알림음
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+      audio.play();
+    } catch(e) {}
+  }
+
+  function loadPhotos() {
     const grid = document.getElementById('photo-grid');
-    grid.innerHTML = '<div style="text-align:center; color:#888; padding: 2rem; grid-column: 1/-1;">사진을 불러오는 중... ⏳</div>';
+    
+    // 알림 권한 요청
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    if(unsubscribePhotos) {
+      unsubscribePhotos();
+      unsubscribePhotos = null;
+    }
+
+    grid.innerHTML = '<div style="text-align:center; color:#888; padding: 2rem; grid-column: 1/-1;">사진을 실시간으로 불러오는 중... ⏳</div>';
 
     try {
       if(db) {
-        const snap = await db.collection('photo_missions').orderBy('submittedAt', 'desc').get();
-        allPhotos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        let isInitialLoad = true;
+        unsubscribePhotos = db.collection('photo_missions').orderBy('submittedAt', 'desc')
+          .onSnapshot(snap => {
+            allPhotos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderPhotos();
+
+            if(!isInitialLoad) {
+              snap.docChanges().forEach(change => {
+                if(change.type === 'added') {
+                  const p = change.doc.data();
+                  if(!p.approved) {
+                    showAdminToast(`🔔 새 사진 도착: ${p.studentName} 학생`);
+                    playAlertSound();
+                    
+                    if(Notification.permission === 'granted') {
+                      const notification = new Notification('📸 새로운 인증 사진 도착!', {
+                        body: `${p.studentName} 학생이 미션 사진을 제출했습니다. 승인해주세요!`,
+                        requireInteraction: true
+                      });
+                      notification.onclick = function() {
+                        window.focus();
+                        switchTab('photo');
+                        this.close();
+                      };
+                    }
+                  }
+                }
+              });
+            }
+            isInitialLoad = false;
+          }, err => {
+            console.error(err);
+            grid.innerHTML = `<div style="text-align:center; color:red; padding: 2rem; grid-column: 1/-1;">사진을 불러오지 못했습니다.<br><br><span style="font-size:0.85rem; color:#888;">[에러 내용: ${err.message}]</span></div>`;
+          });
       } else {
         allPhotos = [];
+        renderPhotos();
       }
-      renderPhotos();
     } catch(err) {
       console.error(err);
-      grid.innerHTML = `<div style="text-align:center; color:red; padding: 2rem; grid-column: 1/-1;">사진을 불러오지 못했습니다.<br><br><span style="font-size:0.85rem; color:#888;">[에러 내용: ${err.message}]</span></div>`;
+      grid.innerHTML = `<div style="text-align:center; color:red; padding: 2rem; grid-column: 1/-1;">오류 발생<br><br><span style="font-size:0.85rem; color:#888;">[에러 내용: ${err.message}]</span></div>`;
     }
   }
 
