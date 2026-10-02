@@ -92,14 +92,15 @@
       td:before { position: absolute; top: 0; left: 0; width: 90px; white-space: nowrap; font-weight: bold; color: var(--primary); font-size: 0.85rem; }
       td:nth-of-type(1):before { content: "이름:"; }
       td:nth-of-type(2):before { content: "학반/번호:"; }
-      td:nth-of-type(3):before { content: "M1 직업:"; }
-      td:nth-of-type(4):before { content: "M6 단어:"; }
-      td:nth-of-type(5):before { content: "M7 추리:"; }
-      td:nth-of-type(6):before { content: "M8 번호:"; }
-      td:nth-of-type(7):before { content: "M9 유언:"; }
-      td:nth-of-type(8):before { content: "M10 다짐:"; }
-      td:nth-of-type(9):before { content: "제출 일시:"; }
-      td:nth-of-type(10):before { content: "상세 보기:"; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
+      td:nth-of-type(3):before { content: "상태:"; }
+      td:nth-of-type(4):before { content: "M1 직업:"; }
+      td:nth-of-type(5):before { content: "M6 단어:"; }
+      td:nth-of-type(6):before { content: "M7 추리:"; }
+      td:nth-of-type(7):before { content: "M8 번호:"; }
+      td:nth-of-type(8):before { content: "M9 유언:"; }
+      td:nth-of-type(9):before { content: "M10 다짐:"; }
+      td:nth-of-type(10):before { content: "제출 일시:"; }
+      td:nth-of-type(11):before { content: "관리:"; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
     }
   </style>
 </head>
@@ -163,7 +164,7 @@
                 <th>M9(사형장) 유언</th>
                 <th>M10(추모비) 다짐</th>
                 <th>제출 일시</th>
-                <th>상세 보기</th>
+                <th>관리</th>
               </tr>
             </thead>
             <tbody id="table-body">
@@ -417,7 +418,10 @@
         <td>${esc(d.m9_will).substring(0, 10)}...</td>
         <td>${esc(d.m10_career)}</td>
         <td>${esc(d.submittedAtLocal)}</td>
-        <td><button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openModal('${d.id}')">상세</button></td>
+        <td>
+          <button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openModal('${d.id}')">상세</button>
+          <button class="btn" style="background:#ef4444; color:white; padding:0.3rem 0.6rem; font-size:0.8rem; margin-left:0.3rem;" onclick="deleteSubmission('${d.id}')">삭제</button>
+        </td>
       </tr>
     `).join('');
   }
@@ -458,6 +462,9 @@
           <strong>꿈꾸는 직업:</strong> ${esc(d.m10_career)}<br><br>
           <strong>나의 다짐:</strong><br>${esc(d.m10_pledge).replace(/\n/g, '<br>')}
         </div>
+      </div>
+      <div style="margin-top: 1.5rem; text-align: right; border-top: 1px solid var(--border); padding-top: 1rem;">
+        <button class="btn" style="background:#ef4444; color:white; padding:0.5rem 1rem; cursor:pointer;" onclick="closeModal(); deleteSubmission('${d.id}')">🗑️ 이 학생 데이터 삭제</button>
       </div>
     `;
     document.getElementById('modal-overlay').classList.add('show');
@@ -729,6 +736,27 @@
 
   function closeImgModal() {
     document.getElementById('img-modal').classList.remove('show');
+  }
+
+  async function deleteSubmission(id) {
+    if(!confirm("정말로 이 학생의 제출 데이터를 삭제하시겠습니까? 복구할 수 없습니다.")) return;
+    try {
+      if(db) {
+        await getCollection('escape_submissions').doc(id).delete();
+      } else {
+        const raw = localStorage.getItem('escape_submissions');
+        if(raw) {
+          let lsData = JSON.parse(raw);
+          lsData = lsData.filter(x => x.id !== id);
+          localStorage.setItem('escape_submissions', JSON.stringify(lsData));
+        }
+      }
+      showAdminToast('🗑️ 학생 데이터가 삭제되었습니다.');
+      loadData();
+    } catch(err) {
+      console.error(err);
+      showAdminToast('오류 발생: ' + err.message, true);
+    }
   }
 
   function showAdminToast(msg, isError = false) {
