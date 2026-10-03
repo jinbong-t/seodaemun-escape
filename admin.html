@@ -419,8 +419,10 @@
         <td>${esc(d.m10_career)}</td>
         <td>${esc(d.submittedAtLocal)}</td>
         <td>
-          <button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openModal('${d.id}')">상세</button>
-          <button class="btn" style="background:#ef4444; color:white; padding:0.3rem 0.6rem; font-size:0.8rem; margin-left:0.3rem;" onclick="deleteSubmission('${d.id}')">삭제</button>
+          <div style="display: flex; gap: 0.3rem; flex-wrap: wrap;">
+            <button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openModal('${d.id}')">상세</button>
+            <button class="btn" style="background:#ef4444; color:white; padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="deleteSubmission('${d.id}')">삭제</button>
+          </div>
         </td>
       </tr>
     `).join('');
